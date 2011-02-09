@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 version = '0.1'
 
-setup(name='serveradmin',
+setup(name='zyklop',
       version=version,
       description="Administrate servers",
       long_description="",
@@ -15,12 +15,12 @@ setup(name='serveradmin',
       author_email='roman@bromeco.de',
       url='',
       license='GPL',
-      packages=find_packages('src'),
-      package_dir = {'': 'src'},
+      packages=find_packages(exclude=['ez_setup']),
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'fabric',
       ],
       extras_require=dict(
           test=['mocker',]
