@@ -67,11 +67,20 @@ def search_for_zope():
               "search. Don't start with the root!"
               " e.g.: /opt"),
         type="string")
+    parser.add_option(
+        "-s", "--server", dest="server",
+        help=("A host to perform the search on."),
+        type="string")
 
     (options, args) = parser.parse_args()
     if not options.path or options.path == '/':
         parser.error(
             "Ehrm - where do you want to search today?")
+    if not options.server:
+        parser.error(
+            "Need a host to connect to. Specify with -s or --server")
+    else:
+        fabric.api.env.host_string = options.server
     search = FabricSearch(options.path, options.match)
     path, level = search.find(search.get_children(search.top))
     print "Found {0} at level {1}".format(path, level)
