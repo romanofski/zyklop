@@ -12,10 +12,12 @@ class Search(object):
         self.top = top
         self.regexp = re.compile(regexp)
 
-    def find(self, children, visited=None, level=0):
+    def find(self, children=None, visited=None, level=0):
         """ BFS to find a zope sandbox."""
         if level == self.maxdepth:
             return
+        if not children:
+            children = self.get_children(self.top)
 
         if visited is None:
             visited = []
@@ -82,5 +84,5 @@ def search_for_zope():
     else:
         fabric.api.env.host_string = options.server
     search = FabricSearch(options.path, options.match)
-    path, level = search.find(search.get_children(search.top))
+    path, level = search.find()
     print "Found {0} at level {1}".format(path, level)
