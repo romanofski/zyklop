@@ -26,9 +26,9 @@ class TestSearch(unittest.TestCase):
         return []
 
     def test_base(self):
-        search = zyklop.search.Search(self.tempdir, 'bin/instance')
+        search = zyklop.search.Search(self.tempdir, '^.*bin/instance')
         # we'll use os.listdir to get the children
         search._get_children_helper = self.children_helper
         child, level = search.find(self.children_helper(search.top))
-        self.assertTrue(child is not None)
+        self.assertTrue(child.endswith('folder1/bin/instance'))
         self.assertEquals(level, 2)

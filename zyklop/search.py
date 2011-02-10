@@ -8,9 +8,9 @@ class Search(object):
 
     maxdepth = 4
 
-    def __init__(self, top, match):
+    def __init__(self, top, regexp):
         self.top = top
-        self.match = match
+        self.regexp = re.compile(regexp)
 
     def find(self, children, visited=None, level=0):
         """ BFS to find a zope sandbox."""
@@ -27,7 +27,7 @@ class Search(object):
             child = children.pop()
             if child in visited:
                 continue
-            if child.endswith('bin/instance'):
+            if self.regexp.search(child):
                 return (child, level)
             visited.append(child)
 
