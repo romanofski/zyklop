@@ -15,7 +15,7 @@ class Search(object):
     def find(self, children=None, visited=None, level=0):
         """ BFS to find a zope sandbox."""
         if level == self.maxdepth:
-            return
+            return (None, 0)
         if not children:
             children = self.get_children(self.top)
 

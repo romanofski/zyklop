@@ -32,3 +32,10 @@ class TestSearch(unittest.TestCase):
         child, level = search.find()
         self.assertTrue(child.endswith('folder1/bin/instance'))
         self.assertEquals(level, 2)
+
+    def test_noresult(self):
+        search = zyklop.search.Search(self.tempdir, 'foobarnotexist')
+        search._get_children_helper = self.children_helper
+        child, level = search.find()
+        self.assertEquals(child, None)
+        self.assertEquals(level, 0)
