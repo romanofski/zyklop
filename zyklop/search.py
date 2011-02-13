@@ -4,6 +4,13 @@ import optparse
 import os.path
 
 
+class SearchResult(object):
+
+    def __init__(self, path, level):
+        self.path = path
+        self.level = level
+
+
 class Search(object):
 
     maxdepth = 4
@@ -15,7 +22,7 @@ class Search(object):
     def find(self, children=None, visited=None, level=0):
         """ BFS to find a zope sandbox."""
         if level == self.maxdepth:
-            return (None, 0)
+            return []
         if not children:
             children = self.get_children(self.top)
 
@@ -25,16 +32,20 @@ class Search(object):
             for c in visited:
                 children += self.get_children(c)
 
+        found = []
         while children:
             child = children.pop()
             if child in visited:
                 continue
             if self.regexp.search(child):
-                return (child, level)
+                found.append(SearchResult(child, level))
             visited.append(child)
 
         level += 1
-        return self.find(children, visited, level=level)
+        result = self.find(children, visited, level=level)
+        if result is not None:
+            found += result
+        return found
 
     def get_children(self, abspath):
         if not abspath.startswith('/'):

@@ -1,5 +1,6 @@
 import os
 import os.path
+import re
 import shutil
 import tempfile
 import unittest
@@ -29,13 +30,20 @@ class TestSearch(unittest.TestCase):
         search = zyklop.search.Search(self.tempdir, '^.*bin/instance')
         # we'll use os.listdir to get the children
         search._get_children_helper = self.children_helper
-        child, level = search.find()
-        self.assertTrue(child.endswith('folder1/bin/instance'))
-        self.assertEquals(level, 2)
+        found = search.find()
+        self.assertTrue(len(found), 1)
+        self.assertTrue(found[0].path.endswith('folder1/bin/instance'))
+        self.assertEquals(found[0].level, 2)
+
+        os.mkdir(os.path.join(self.tempdir, 'folder2', 'bin'))
+        search.regexp = re.compile('^.*bin$')
+        found = search.find()
+        self.assertEquals(len(found), 2)
+        self.assertTrue(found[0].path.endswith('folder1/bin'))
+        self.assertTrue(found[1].path.endswith('folder2/bin'))
 
     def test_noresult(self):
         search = zyklop.search.Search(self.tempdir, 'foobarnotexist')
         search._get_children_helper = self.children_helper
-        child, level = search.find()
-        self.assertEquals(child, None)
-        self.assertEquals(level, 0)
+        found = search.find()
+        self.assertEquals(found, [])
