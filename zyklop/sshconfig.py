@@ -12,12 +12,35 @@ class SSHConfigParser(object):
 
     def parse(self):
         """ parses the config."""
-        host = re.compile('^HostName.*')
-        username = re.compile('^User.*')
-        port = re.compile('^Port.*')
+        result = {}
+        confhost = None
+        re_template = ('{0}\s(.*)$')
+        host = re.compile('^Host\s(.*)$')
+        keys = ['HostName', 'User', 'Port']
 
         with open(self.path, 'r') as f:
             for line in f:
-                hostmatch = host.match(line)
-                usernamematch = username.match(line)
-                portmatch = port.match(line)
+                currenthostkey = (host.match(line) and
+                                  host.match(line).groups()[0] or
+                                  None)
+                if currenthostkey and confhost:
+                    result[confhost.key] = confhost
+                if currenthostkey:
+                    confhost = result.get(currenthostkey, Host(currenthostkey))
+                    continue
+                if confhost:
+                    for k in keys:
+                        match = re.match(re_template.format(k), line)
+                        if match:
+                            setattr(confhost, k, match.groups()[0])
+        result[confhost.key] = confhost
+        return result
+
+
+class Host(object):
+
+    def __init__(self, key, HostName='', Port='', User=''):
+        self.key = key
+        self.HostName = HostName
+        self.Port = Port
+        self.User = User

@@ -10,6 +10,19 @@ class TestSearch(unittest.TestCase):
     def test_sshparser(self):
         config = os.path.join(os.path.dirname(__file__), 'testdata',
                               'samplesshconfig.cfg')
-        search = zyklop.sshconfig.SSHConfigParser(path=config)
-        self.assertEquals(search.path, config)
+        parser = zyklop.sshconfig.SSHConfigParser(path=config)
+        self.assertEquals(parser.path, config)
 
+        parsed = parser.parse()
+        self.assertEquals(len(parsed), 7)
+
+        expected = ['zopedev', 'devel', 'wilber',
+                     'gecko', 'svn.berlios.de',
+                     'cmswiki.foobar.com.au',
+                     'svn.zope.org']
+        self.assertEquals(sorted(parsed.keys()), sorted(expected))
+
+        host = parsed['devel']
+        self.assertEquals(host.HostName, 'dev.foobar.com')
+        self.assertEquals(host.Port, '22')
+        self.assertEquals(host.User, 'rj')
