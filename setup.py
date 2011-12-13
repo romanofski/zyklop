@@ -28,7 +28,7 @@ setup(
     ),
     entry_points = {
         'console_scripts': [
-            'search = zyklop.search:search_for_zope',
+            'sync_storages = zyklop.search:sync_storages',
         ]
     }
 )
