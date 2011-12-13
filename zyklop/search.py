@@ -1,7 +1,8 @@
+import argparse
 import fabric.api
-import re
-import optparse
 import os.path
+import re
+import zyklop.sshconfig
 
 
 class SearchResult(object):
@@ -66,34 +67,30 @@ class FabricSearch(Search):
         return [os.path.join(abspath, c) for c in re.split('\s', children)]
 
 
-def search_for_zope():
-    parser = optparse.OptionParser()
-    parser.add_option(
-        "-m", "--match", dest="match",
-        help=("A match string the search is looking for. This can be a"
-              "path, e.g: bin/instace"),
-        type="string",
-        default="bin/instance")
-    parser.add_option(
-        "-p", "--path", dest="path",
+def sync_storages():
+    parser = argparse.ArgumentParser(description="Syncs local storages")
+    parser.add_argument(
+        'alias', type=unicode,
+        help="Server alias to connect to, specified in your $HOME/.ssh/config")
+    parser.add_argument(
+        "path",
         help=("A path in the remote filesystem from where to start the"
-              "search. Don't start with the root!"
+              " search. Don't start with the root!"
               " e.g.: /opt"),
-        type="string")
-    parser.add_option(
-        "-s", "--server", dest="server",
-        help=("A host to perform the search on."),
-        type="string")
+        type=str)
+    parser.add_argument(
+        "match",
+        help=("A match string the search is looking for. This can be a"
+              " path. Defaults to: filestorage"),
+        type=str,
+        default="filestorage")
 
-    (options, args) = parser.parse_args()
-    if not options.path or options.path == '/':
+    arguments = parser.parse_args()
+    if not arguments.path or arguments.path == '/':
         parser.error(
             "Ehrm - where do you want to search today?")
-    if not options.server:
-        parser.error(
-            "Need a host to connect to. Specify with -s or --server")
-    else:
-        fabric.api.env.host_string = options.server
-    search = FabricSearch(options.path, options.match)
+    sshconfig = zyklop.sshconfig.SSHConfigParser().parse()
+    fabric.api.env.host_string = sshconfig[arguments.alias].HostName
+    search = FabricSearch(arguments.path, arguments.match)
     path, level = search.find()
     print "Found {0} at level {1}".format(path, level)
