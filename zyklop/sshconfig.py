@@ -7,7 +7,7 @@ class SSHConfigParser(object):
 
     def __init__(self, path=None):
         if path is None:
-            self.path = os.path.expanduser('.ssh/config')
+            path = os.path.expanduser('~/.ssh/config')
         self.path = path
 
     def parse(self):
