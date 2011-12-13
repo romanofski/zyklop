@@ -39,7 +39,7 @@ class SSHConfigParser(object):
 
 class Host(object):
 
-    def __init__(self, key, HostName='', Port='', User=''):
+    def __init__(self, key, HostName='', Port='22', User=''):
         self.key = key
         self.HostName = HostName
         self.Port = Port
