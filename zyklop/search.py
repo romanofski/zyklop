@@ -1,4 +1,5 @@
 import fabric.api
+import fabric.state
 import os.path
 import re
 
@@ -63,6 +64,8 @@ class FabricSearch(Search):
 
     def _get_children_helper(self, abspath):
         fabric.api.env.warn_only = True
+        fabric.state.output.running = False
+        fabric.state.output.stdout = False
         result = fabric.api.run("ls {0}".format(abspath))
         children = result.failed != True and result or ''
         return [os.path.join(abspath, c) for c in re.split('\s', children)]
