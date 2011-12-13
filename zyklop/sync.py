@@ -10,7 +10,7 @@ import zyklop.sshconfig
 
 RSYNC_TEMPL = ('rsync -av -e "ssh -l {host.User} -p {host.Port}" '
                '--partial --progress --compress-level=9 '
-               '{host.HostName}:{remotepath} {localdir}')
+               '{host.key}:{remotepath} {localdir}')
 logger = logging.getLogger('zyklop')
 stdout = logging.StreamHandler(sys.__stdout__)
 logger.addHandler(stdout)
