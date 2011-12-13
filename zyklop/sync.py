@@ -1,7 +1,19 @@
 import argparse
 import fabric.api
-import zyklop.sshconfig
+import logging
+import os
+import subprocess
+import sys
 import zyklop.search
+import zyklop.sshconfig
+
+
+RSYNC_TEMPL = ('rsync -av -e "ssh -l {host.User} -p {host.Port}" '
+               '--partial --progress --compress-level=9 '
+               '{host.HostName}:{remotepath} {localdir}')
+logger = logging.getLogger('zyklop')
+stdout = logging.StreamHandler(sys.__stdout__)
+logger.addHandler(stdout)
 
 
 def sync_storages():
@@ -21,16 +33,30 @@ def sync_storages():
               " path. Defaults to: filestorage"),
         type=str,
         default="filestorage")
+    parser.add_argument(
+        "-d",
+        help=("Dry run. Only show what we found."),
+        type=bool,
+        default=False)
 
     arguments = parser.parse_args()
     if not arguments.path or arguments.path == '/':
         parser.error(
             "Ehrm - where do you want to search today?")
     sshconfig = zyklop.sshconfig.SSHConfigParser().parse()
-    fabric.api.env.host_string = '{host}:{port}'.format(
-        host=sshconfig[arguments.alias].HostName,
-        port=sshconfig[arguments.alias].Port)
+    host = sshconfig[arguments.alias]
+    fabric.api.env.host_string = '{host.HostName}:{host.Port}'.format(
+        host=host)
     search = zyklop.search.FabricSearch(arguments.path, arguments.match)
     results = search.find()
-    for i in results:
-        print "Found {0} at level {1}".format(i.path, i.level)
+    if arguments.d:
+        for i in results:
+            logger.warning("Found {0} at level {1}".format(i.path, i.level))
+        sys.exit(0)
+    else:
+        localdir = os.path.abspath(os.getcwd())
+        cmd = RSYNC_TEMPL.format(host=host,
+                                 remotepath=results[0].path,
+                                 localdir=localdir)
+        logger.warning(cmd)
+        subprocess.Popen(cmd, shell=True)
