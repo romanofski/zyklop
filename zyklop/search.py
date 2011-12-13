@@ -62,6 +62,8 @@ class Search(object):
 class FabricSearch(Search):
 
     def _get_children_helper(self, abspath):
-        children = fabric.api.run("ls {0}".format(abspath))
+        fabric.api.env.warn_only = True
+        result = fabric.api.run("ls {0}".format(abspath))
+        children = result.failed != True and result or ''
         return [os.path.join(abspath, c) for c in re.split('\s', children)]
 
