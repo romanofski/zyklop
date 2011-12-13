@@ -1,4 +1,4 @@
-import os.path
+import os
 import re
 
 
@@ -43,4 +43,4 @@ class Host(object):
         self.key = key
         self.HostName = HostName
         self.Port = Port
-        self.User = User
+        self.User = User and User or os.environ['LOGNAME']

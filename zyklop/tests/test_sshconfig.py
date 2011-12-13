@@ -26,3 +26,5 @@ class TestSearch(unittest.TestCase):
         self.assertEquals(host.HostName, 'dev.foobar.com')
         self.assertEquals(host.Port, '22')
         self.assertEquals(host.User, 'rj')
+
+        self.assertEquals(parsed['wilber'].User, os.environ['LOGNAME'])
