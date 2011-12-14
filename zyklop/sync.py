@@ -16,8 +16,11 @@ stdout = logging.StreamHandler(sys.__stdout__)
 logger.addHandler(stdout)
 
 
-def sync_storages():
-    parser = argparse.ArgumentParser(description="Syncs local storages")
+def sync():
+    parser = argparse.ArgumentParser(
+        description="Uses rsync to sync directories",
+        epilog=("Use at your own risk and not in production"
+                " environments!!!!".upper()))
     parser.add_argument(
         'alias', type=unicode,
         help="Server alias to connect to, specified in your $HOME/.ssh/config")

@@ -28,7 +28,7 @@ setup(
     ),
     entry_points = {
         'console_scripts': [
-            'sync_storages = zyklop.sync:sync_storages',
+            'sync = zyklop.sync:sync',
         ]
     }
 )
