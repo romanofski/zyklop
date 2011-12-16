@@ -27,7 +27,7 @@ class TestSearch(unittest.TestCase):
             return [os.path.join(path, x) for x in os.listdir(path)]
         return []
 
-    def test_base(self):
+    def test_find(self):
         search = zyklop.search.Search(self.tempdir, '^.*bin/instance')
         # we'll use os.listdir to get the children
         search._get_children_helper = self.children_helper
