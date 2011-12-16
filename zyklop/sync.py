@@ -38,9 +38,10 @@ def sync():
         default="filestorage")
     parser.add_argument(
         "-d",
+        "--dry-run",
+        dest='dry_run',
         help=("Dry run. Only show what we found."),
-        type=bool,
-        default=False)
+        action="store_true")
 
     arguments = parser.parse_args()
     if not arguments.path or arguments.path == '/':
@@ -52,7 +53,7 @@ def sync():
         host=host)
     search = zyklop.search.FabricSearch(arguments.path, arguments.match)
     results = search.find()
-    if arguments.d:
+    if arguments.dry_run:
         for i in results:
             logger.warning("Found {0} at level {1}".format(i.path, i.level))
         sys.exit(0)
