@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 import zyklop.search
-import zyklop.sshconfig
+import zyklop.ssh
 
 
 SSH_CMD = 'ssh -l {host.User} -p {host.Port}'
@@ -48,7 +48,7 @@ def sync():
     if not arguments.path or arguments.path == '/':
         parser.error(
             "Ehrm - where do you want to search today?")
-    sshconfig = zyklop.sshconfig.SSHConfigParser().parse()
+    sshconfig = zyklop.ssh.SSHConfigParser().parse()
     host = sshconfig[arguments.alias]
     fabric.api.env.host_string = '{host.HostName}:{host.Port}'.format(
         host=host)

@@ -1,7 +1,7 @@
 import os
 import os.path
 import unittest
-import zyklop.sshconfig
+import zyklop.ssh
 
 
 class TestSearch(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestSearch(unittest.TestCase):
     def test_sshparser(self):
         config = os.path.join(os.path.dirname(__file__), 'testdata',
                               'samplesshconfig.cfg')
-        parser = zyklop.sshconfig.SSHConfigParser(path=config)
+        parser = zyklop.ssh.SSHConfigParser(path=config)
         self.assertEquals(parser.path, config)
 
         parsed = parser.parse()

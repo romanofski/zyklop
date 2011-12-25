@@ -26,7 +26,8 @@ class SSHConfigParser(object):
                 if currenthostkey and confhost:
                     result[confhost.key] = confhost
                 if currenthostkey:
-                    confhost = result.get(currenthostkey, Host(currenthostkey))
+                    confhost = result.get(currenthostkey,
+                                          SSHConfigHost(currenthostkey))
                     continue
                 if confhost:
                     for k in keys:
@@ -37,7 +38,7 @@ class SSHConfigParser(object):
         return result
 
 
-class Host(object):
+class SSHConfigHost(object):
 
     def __init__(self, key, HostName='', Port='22', User=''):
         self.key = key
