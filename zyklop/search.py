@@ -10,6 +10,10 @@ class SearchResult(object):
         self.path = path
         self.level = level
 
+    def __repr__(self):
+        return '<{0} object {1}>'.format(
+            self.__class__.__name__, self.path)
+
 
 class Search(object):
 
