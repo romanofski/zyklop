@@ -4,8 +4,7 @@ import unittest
 import zyklop.ssh
 
 
-class TestSearch(unittest.TestCase):
-    """ Basic test to test the BFS and DFS searches """
+class TestSSHConfigParser(unittest.TestCase):
 
     def test_sshparser(self):
         config = os.path.join(os.path.dirname(__file__), 'testdata',
@@ -28,3 +27,4 @@ class TestSearch(unittest.TestCase):
         self.assertEquals(host.User, 'rj')
 
         self.assertEquals(parsed['wilber'].User, os.environ['LOGNAME'])
+
