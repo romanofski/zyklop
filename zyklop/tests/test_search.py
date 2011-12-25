@@ -7,6 +7,52 @@ import unittest
 import zyklop.search
 
 
+FAKEFSTREE = {'/': dict(
+    folder1=dict(
+        bin=dict(instance=dict())
+    ),
+    folder2=dict(),
+    folder3=dict(),
+)
+}
+
+
+def get_children(path, tree):
+    def walk(path, tree, visited=None):
+        if visited == None:
+            visited = []
+        segm = path.pop()
+        if segm == '':
+            segm = '/'
+        visited.append(segm)
+        if path:
+            children = walk(path, tree[segm], visited)
+        else:
+            children = tree[segm].keys()
+        children = [os.path.join(*visited + [x]) for x in children]
+        return children
+
+    if path == '/':
+        segments = ['']
+    else:
+        segments = path.split('/')
+        segments.reverse()
+    return walk(segments, tree)
+
+
+class TestWalkFakeFSTree(unittest.TestCase):
+
+    def test_get_children(self):
+        children = get_children('/', FAKEFSTREE)
+        self.assertEquals(['/folder3', '/folder2', '/folder1'], children)
+
+        children = get_children('/folder2', FAKEFSTREE)
+        self.assertEquals([], children)
+
+        children = get_children('/folder1/bin', FAKEFSTREE)
+        self.assertEquals(['/folder1/bin/instance'], children)
+
+
 class TestSearch(unittest.TestCase):
     """ Basic test to test the BFS and DFS searches """
 
