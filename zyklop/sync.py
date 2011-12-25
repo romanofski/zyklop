@@ -17,6 +17,13 @@ stdout = logging.StreamHandler(sys.__stdout__)
 logger.addHandler(stdout)
 
 
+def paramiko_sync():
+    host = zyklop.ssh.SSHConfigHost('localhost', 'localhost')
+    sshrsync = zyklop.ssh.SSHRsync(host, '/tmp/foo.txt', '/tmp/letter.tex')
+    sftp = sshrsync.connect()
+    sshrsync.get_remote_fileobj(sftp)
+
+
 def sync():
     parser = argparse.ArgumentParser(
         description="Uses rsync to sync directories",

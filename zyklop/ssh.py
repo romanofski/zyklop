@@ -5,17 +5,28 @@ import re
 
 class SSHRsync(object):
 
-    def __init__(self, sshconfighost, localfp, remotefp):
+    def __init__(self, sshconfighost, localpath, remotepath):
         self.host = sshconfighost
+        self.localpath = localpath
+        self.remotepath = remotepath
 
     def connect(self):
-        """ Connects with the remote host via paramiko."""
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.host.alias, username=self.host.User)
+        """ Connects with the remote host via paramiko. Returns
+            paramiko.SFTP
+        """
+        # XXX
+        privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
+        mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile)
 
-    def get_remote_fileobj(self):
+        transport = paramiko.Transport((self.host.alias,
+                                        int(self.host.Port)))
+        transport.connect(username=self.host.User, pkey=mykey)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        return sftp
+
+    def get_remote_fileobj(self, sftp):
         """ Returns paramiko.SFTPFile obj."""
+        file = sftp.file(self.remotepath)
 
 
 class SSHConfigParser(object):
