@@ -1,5 +1,21 @@
 import os
+import paramiko
 import re
+
+
+class SSHRsync(object):
+
+    def __init__(self, sshconfighost, localfp, remotefp):
+        self.host = sshconfighost
+
+    def connect(self):
+        """ Connects with the remote host via paramiko."""
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(self.host.key, username=self.host.User)
+
+    def get_remote_fileobj(self):
+        """ Returns paramiko.SFTPFile obj."""
 
 
 class SSHConfigParser(object):
