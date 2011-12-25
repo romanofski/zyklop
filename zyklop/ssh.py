@@ -12,7 +12,7 @@ class SSHRsync(object):
         """ Connects with the remote host via paramiko."""
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.host.key, username=self.host.User)
+        ssh.connect(self.host.alias, username=self.host.User)
 
     def get_remote_fileobj(self):
         """ Returns paramiko.SFTPFile obj."""
@@ -40,7 +40,7 @@ class SSHConfigParser(object):
                                   host.match(line).groups()[0] or
                                   None)
                 if currenthostkey and confhost:
-                    result[confhost.key] = confhost
+                    result[confhost.alias] = confhost
                 if currenthostkey:
                     confhost = result.get(currenthostkey,
                                           SSHConfigHost(currenthostkey))
@@ -50,14 +50,14 @@ class SSHConfigParser(object):
                         match = re.match(re_template.format(k), line)
                         if match:
                             setattr(confhost, k, match.groups()[0])
-        result[confhost.key] = confhost
+        result[confhost.alias] = confhost
         return result
 
 
 class SSHConfigHost(object):
 
-    def __init__(self, key, HostName='', Port='22', User=''):
-        self.key = key
+    def __init__(self, alias, HostName='', Port='22', User=''):
+        self.alias = alias
         self.HostName = HostName
         self.Port = Port
         self.User = User and User or os.environ['LOGNAME']

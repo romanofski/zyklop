@@ -11,7 +11,7 @@ import zyklop.ssh
 SSH_CMD = 'ssh -l {host.User} -p {host.Port}'
 RSYNC_TEMPL = ('rsync -av -e '
                '--partial --progress --compress-level=9 '
-               '{host.key}:{remotepath} {localdir}')
+               '{host.alias}:{remotepath} {localdir}')
 logger = logging.getLogger('zyklop')
 stdout = logging.StreamHandler(sys.__stdout__)
 logger.addHandler(stdout)
