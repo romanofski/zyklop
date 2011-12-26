@@ -1,32 +1,39 @@
 import os
 import paramiko
 import re
+import zyklop.rsync
 
 
 class SSHRsync(object):
 
-    def __init__(self, sshconfighost, localpath, remotepath):
+    def __init__(self, sshconfighost):
         self.host = sshconfighost
-        self.localpath = localpath
-        self.remotepath = remotepath
 
     def connect(self):
         """ Connects with the remote host via paramiko. Returns
             paramiko.SFTP
         """
-        # XXX
-        privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
-        mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile)
-
+        mykey = self.get_user_pkey()
         transport = paramiko.Transport((self.host.alias,
                                         int(self.host.Port)))
         transport.connect(username=self.host.User, pkey=mykey)
-        sftp = paramiko.SFTPClient.from_transport(transport)
-        return sftp
+        self.sftp = paramiko.SFTPClient.from_transport(transport)
 
-    def get_remote_fileobj(self, sftp):
+    def get_user_pkey(self):
+        """ Returns the users private key."""
+        privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
+        return paramiko.RSAKey.from_private_key_file(privatekeyfile)
+
+    def get_remote_fileobj(self):
         """ Returns paramiko.SFTPFile obj."""
-        file = sftp.file(self.remotepath)
+        file = self.sftp.file(self.remotepath)
+
+    def get_hashes_for(self, filepath):
+        """ Hashes the local file given by filepath. Needs to be a file
+            otherwise an IOError is raised.
+        """
+        with open(filepath, 'rb') as f:
+            return zyklop.rsync.blockchecksums(f)
 
 
 class SSHConfigParser(object):
