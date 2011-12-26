@@ -1,7 +1,5 @@
 import os
-import hashlib
 import paramiko
-import re
 import zyklop.rsync
 
 
@@ -9,17 +7,18 @@ class SSHRsync(object):
 
     sftp = None
 
-    def __init__(self, sshconfighost):
-        self.host = sshconfighost
+    def __init__(self, hostname, port, user=None):
+        self.hostname = hostname
+        self.port = port
+        self.user = user and user or os.environ['LOGNAME']
 
     def connect(self):
         """ Connects with the remote host via paramiko. Returns
             paramiko.SFTP
         """
         mykey = self.get_user_pkey()
-        transport = paramiko.Transport((self.host.alias,
-                                        int(self.host.Port)))
-        transport.connect(username=self.host.User, pkey=mykey)
+        transport = paramiko.Transport((self.hostname, self.port))
+        transport.connect(username=self.user, pkey=mykey)
         self.sftp = paramiko.SFTPClient.from_transport(transport)
 
     def get_user_pkey(self):
@@ -59,55 +58,7 @@ class SSHRsync(object):
                 unpatched.close()
 
         with open(localfile, 'r') as unpatched:
-            unpatched_uid = hashlib.sha1(unpatched.read()).hexdigest()
-            unpatched.seek(0)
-
             with open(newfile, 'wb') as saveto:
                 zyklop.rsync.patchstream(unpatched, saveto, delta)
                 saveto.close()
                 os.rename(newfile, localfile)
-
-
-class SSHConfigParser(object):
-    """ Parses your .ssh/config """
-
-    def __init__(self, path=None):
-        if path is None:
-            path = os.path.expanduser('~/.ssh/config')
-        self.path = path
-
-    def parse(self):
-        """ parses the config."""
-        result = {}
-        confhost = None
-        re_template = ('{0}\s(.*)$')
-        host = re.compile('^Host\s(.*)$')
-        keys = ['HostName', 'User', 'Port']
-
-        with open(self.path, 'r') as f:
-            for line in f:
-                currenthostkey = (host.match(line) and
-                                  host.match(line).groups()[0] or
-                                  None)
-                if currenthostkey and confhost:
-                    result[confhost.alias] = confhost
-                if currenthostkey:
-                    confhost = result.get(currenthostkey,
-                                          SSHConfigHost(currenthostkey))
-                    continue
-                if confhost:
-                    for k in keys:
-                        match = re.match(re_template.format(k), line)
-                        if match:
-                            setattr(confhost, k, match.groups()[0])
-        result[confhost.alias] = confhost
-        return result
-
-
-class SSHConfigHost(object):
-
-    def __init__(self, alias, HostName='', Port='22', User=''):
-        self.alias = alias
-        self.HostName = HostName
-        self.Port = Port
-        self.User = User and User or os.environ['LOGNAME']

@@ -2,7 +2,7 @@ import argparse
 import fabric.api
 import logging
 import os
-import subprocess
+import paramiko
 import sys
 import zyklop.search
 import zyklop.ssh
@@ -48,10 +48,21 @@ def sync():
     if not arguments.path or arguments.path == '/':
         parser.error(
             "Ehrm - where do you want to search today?")
-    sshconfig = zyklop.ssh.SSHConfigParser().parse()
-    host = sshconfig[arguments.alias]
-    fabric.api.env.host_string = '{host.HostName}:{host.Port}'.format(
-        host=host)
+
+    sshconfig = paramiko.SSHConfig()
+    sshconfig.parse(open(os.path.expanduser('~/.ssh/config'), 'r'))
+    host = sshconfig.lookup(arguments.alias)
+    hostname = host.get('hostname')
+    port = host.get('port', 22)
+
+    if not hostname:
+        parser.error("Can't find configuration"
+                     " for given alias: {0} in local ~/ssh/config".format(
+                         arguments.alias)
+                    )
+
+    fabric.api.env.host_string = '{hostname}:{port}'.format(
+        hostname=hostname, port=port)
     search = zyklop.search.FabricSearch(arguments.path, arguments.match)
     results = search.find()
     if arguments.dry_run:
@@ -60,5 +71,5 @@ def sync():
         sys.exit(0)
     else:
         localdir = os.path.abspath(os.getcwd())
-        rsync = zyklop.ssh.SSHRsync(host)
+        rsync = zyklop.ssh.SSHRsync(hostname, port)
         rsync.sync_files(localdir, results[0].path)
