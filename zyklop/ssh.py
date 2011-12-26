@@ -1,10 +1,13 @@
 import os
+import hashlib
 import paramiko
 import re
 import zyklop.rsync
 
 
 class SSHRsync(object):
+
+    sftp = None
 
     def __init__(self, sshconfighost):
         self.host = sshconfighost
@@ -24,9 +27,12 @@ class SSHRsync(object):
         privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
         return paramiko.RSAKey.from_private_key_file(privatekeyfile)
 
-    def get_remote_fileobj(self):
+    def get_remote_delta(self, filepath, hashes):
         """ Returns paramiko.SFTPFile obj."""
+        if self.sftp is None:
+            self.connect()
         file = self.sftp.file(self.remotepath)
+        return zyklop.rsync.rsyncdelta(file, hashes)
 
     def get_hashes_for(self, filepath):
         """ Hashes the local file given by filepath. Needs to be a file
@@ -34,6 +40,25 @@ class SSHRsync(object):
         """
         with open(filepath, 'rb') as f:
             return zyklop.rsync.blockchecksums(f)
+
+    def sync_paths(self, localfile, remotefile):
+        hashes = self.get_hashes_for(localfile)
+        delta = self.get_remote_delta(remotefile, hashes)
+        newfile = localfile + '.sync'
+        with open(localfile, 'r') as unpatched:
+            unpatched_uid = hashlib.sha1(unpatched.read()).hexdigest()
+            unpatched.seek(0)
+
+            with open(newfile, 'wb') as saveto:
+                zyklop.rsync.patchstream(unpatched, saveto, delta)
+
+                saveto.seek(0)
+                patched_uid = hashlib.sha1(saveto.read()).hexdigest()
+
+                if patched_uid != unpatched_uid:
+                    raise OSError(
+                        "Checksums mismatch between patched and unpatched.")
+                os.rename(newfile, localfile)
 
 
 class SSHConfigParser(object):
