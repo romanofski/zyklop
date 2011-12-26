@@ -22,11 +22,12 @@ setup(
     install_requires=[
         'setuptools',
         'fabric',
+        'paramiko',
     ],
     extras_require=dict(
-        test=['mocker',]
+        test=['mocker', ]
     ),
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'sync = zyklop.sync:sync',
         ]
