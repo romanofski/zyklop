@@ -19,22 +19,23 @@ class Search(object):
 
     maxdepth = 4
 
-    def __init__(self, top, regexp):
+    def __init__(self, top, regexp, childnodeprovider):
         self.top = top
         self.regexp = re.compile(regexp)
+        self.childnodeprovider = childnodeprovider
 
     def find(self, children=None, visited=None, level=0):
         """ BFS to find a zope sandbox."""
         if level == self.maxdepth:
             return []
         if not children:
-            children = self.get_children(self.top)
+            children = self.childnodeprovider.get_children(self.top)
 
         if visited is None:
             visited = []
         else:
             for c in visited:
-                children += self.get_children(c)
+                children += self.childnodeprovider.get_children(c)
 
         found = []
         while children:
@@ -52,6 +53,9 @@ class Search(object):
                 found += result
         return found
 
+
+class DirectoryChildNodeProvider(object):
+
     def get_children(self, abspath):
         if not abspath.startswith('/'):
             raise ValueError(
@@ -64,7 +68,7 @@ class Search(object):
         raise NotImplemented("Must be implemented in sublcasses.")
 
 
-class FabricSearch(Search):
+class FabricSearch(DirectoryChildNodeProvider):
 
     def _get_children_helper(self, abspath):
         fabric.api.env.warn_only = True
