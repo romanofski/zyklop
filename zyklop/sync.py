@@ -60,12 +60,5 @@ def sync():
         sys.exit(0)
     else:
         localdir = os.path.abspath(os.getcwd())
-        cmd = RSYNC_TEMPL.format(
-            host=host,
-            remotepath=results[0].path,
-            localdir=localdir).split()
-        ssh_cmd = SSH_CMD.format(host=host)
-        cmd.insert(3, ssh_cmd)
-
-        logger.warning(' '.join(cmd))
-        subprocess.call(cmd)
+        rsync = zyklop.ssh.SSHRsync(host)
+        rsync.sync_files(localdir, results[0].path)

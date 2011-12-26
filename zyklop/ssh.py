@@ -31,33 +31,40 @@ class SSHRsync(object):
         """ Returns paramiko.SFTPFile obj."""
         if self.sftp is None:
             self.connect()
-        file = self.sftp.file(self.remotepath)
+        file = self.sftp.file(filepath)
         return zyklop.rsync.rsyncdelta(file, hashes)
 
     def get_hashes_for(self, filepath):
         """ Hashes the local file given by filepath. Needs to be a file
             otherwise an IOError is raised.
         """
-        with open(filepath, 'rb') as f:
-            return zyklop.rsync.blockchecksums(f)
+        checksums = ([], [])
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as f:
+                checksums = zyklop.rsync.blockchecksums(f)
+        return checksums
 
-    def sync_paths(self, localfile, remotefile):
+    def sync_files(self, localpath, remotefile):
+        if os.path.isdir(localpath):
+            localfile = os.path.join(localpath,
+                                     os.path.basename(remotefile))
+        else:
+            localfile = localpath
+
         hashes = self.get_hashes_for(localfile)
         delta = self.get_remote_delta(remotefile, hashes)
         newfile = localfile + '.sync'
+        if not os.path.exists(localfile):
+            with open(localfile, 'w') as unpatched:
+                unpatched.close()
+
         with open(localfile, 'r') as unpatched:
             unpatched_uid = hashlib.sha1(unpatched.read()).hexdigest()
             unpatched.seek(0)
 
             with open(newfile, 'wb') as saveto:
                 zyklop.rsync.patchstream(unpatched, saveto, delta)
-
-                saveto.seek(0)
-                patched_uid = hashlib.sha1(saveto.read()).hexdigest()
-
-                if patched_uid != unpatched_uid:
-                    raise OSError(
-                        "Checksums mismatch between patched and unpatched.")
+                saveto.close()
                 os.rename(newfile, localfile)
 
 
