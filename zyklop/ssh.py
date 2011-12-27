@@ -36,9 +36,11 @@ class SSHRsync(object):
         self.port = port
 
     @connect
-    def get_remote_delta(self, filepath, hashes):
-        """ Returns paramiko.SFTPFile obj."""
-        file = self.sftp.file(filepath)
+    def get_remote_delta(self, filepath, hashes, sftpclient):
+        """ Returns paramiko.SFTPFile obj. Raises an IOError if the file
+            can not be retrieved or is a directory.
+        """
+        file = sftpclient.file(filepath)
         return zyklop.rsync.rsyncdelta(file, hashes)
 
     def get_hashes_for(self, filepath):
@@ -52,7 +54,7 @@ class SSHRsync(object):
         return checksums
 
     @connect
-    def get_type(self, path):
+    def get_type(self, path, sftpclient):
         """ Does a stat on the remote system to check if we're dealing
         with a directory or file.
 
@@ -63,13 +65,13 @@ class SSHRsync(object):
         """
         result = DIRECTORY
         try:
-            self.sftp.listdir(path)
+            sftpclient.listdir(path)
         except IOError:
             result = FILE
         return result
 
     @connect
-    def sync_file(self, localpath, remotepath):
+    def sync_file(self, localpath, remotepath, sftpclient):
         """ Syncs a given local file from the given remotepath.
 
         @param localpath: Path to the local file. If the file does not
@@ -97,4 +99,4 @@ class SSHRsync(object):
                     saveto.close()
                     os.rename(newfile, localpath)
         else:
-            self.sftp.get(remotepath, localpath)
+            sftpclient.get(remotepath, localpath)
