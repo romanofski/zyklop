@@ -23,7 +23,9 @@ def connect(func):
         transport.connect(username=user, pkey=mykey)
         sftp = paramiko.SFTPClient.from_transport(transport)
         kwargs.update(sftpclient=sftp)
-        return func(*args, **kwargs)
+        result = func(*args, **kwargs)
+        sftp.close()
+        return result
     return wrapped
 
 
