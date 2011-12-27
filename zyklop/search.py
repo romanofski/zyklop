@@ -1,6 +1,5 @@
 import os
 import re
-import zyklop.ssh
 
 
 class SearchResult(object):
@@ -64,13 +63,9 @@ class DirectoryChildNodeProvider(object):
 
 class ParamikoChildNodeProvider(DirectoryChildNodeProvider):
 
-    ssh_client = None
+    def __init__(self, sftpclient):
+        self.sftpclient = sftpclient
 
-    def __init__(self, hostname, port):
-        # XXX perhaps we can use an sshconfig dict?
-        self.hostname = hostname
-        self.port = port
-
-    @zyklop.ssh.connect
-    def _get_children_helper(self, abspath, sftpclient):
-        return [os.path.join(abspath, c) for c in sftpclient.listdir(abspath)]
+    def _get_children_helper(self, abspath):
+        return [os.path.join(abspath, c) for c in\
+                self.sftpclient.listdir(abspath)]

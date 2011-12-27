@@ -8,7 +8,8 @@ class TestSSHRSync(zyklop.tests.base.BaseDirectoryTestCase):
 
     def setUp(self):
         super(TestSSHRSync, self).setUp()
-        self.rsync = zyklop.ssh.SSHRsync('localhost', 22)
+        self.rsync = zyklop.ssh.SSHRsync(
+            zyklop.ssh.create_sftpclient('localhost', 22))
 
     def test_get_hashes_for(self):
         hashes = self.rsync.get_hashes_for(
@@ -44,3 +45,16 @@ class TestSSHRSync(zyklop.tests.base.BaseDirectoryTestCase):
 
         with open(localpath, 'r') as copied:
             self.assertEquals('testdata\n', copied.read())
+
+    def test_sync_directories(self):
+        localtemp = tempfile.mkdtemp()
+        self.addCleanup(self.cleanTempDir, localtemp)
+
+        remotepath = os.path.join(self.tempdir, 'folder1')
+        self.rsync.sync_directories(localtemp, remotepath)
+
+        self.assertEquals(['bin', 'etc'], sorted(os.listdir(localtemp)))
+        self.assertEquals(['instance'],
+                          os.listdir(os.path.join(localtemp, 'bin')))
+        self.assertEquals(['file1.txt', 'file2.txt'],
+                          sorted(os.listdir(os.path.join(localtemp, 'etc'))))

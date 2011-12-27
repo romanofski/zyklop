@@ -14,35 +14,24 @@ def get_user_pkey():
     return paramiko.RSAKey.from_private_key_file(privatekeyfile)
 
 
-def connect(func):
-    def wrapped(*args, **kwargs):
-        obj = args[0]
-        mykey = get_user_pkey()
-        user = os.environ['LOGNAME']
-        transport = paramiko.Transport((obj.hostname, obj.port))
-        transport.connect(username=user, pkey=mykey)
-        sftp = paramiko.SFTPClient.from_transport(transport)
-        kwargs.update(sftpclient=sftp)
-        result = func(*args, **kwargs)
-        sftp.close()
-        return result
-    return wrapped
+def create_sftpclient(hostname, port):
+    mykey = get_user_pkey()
+    user = os.environ['LOGNAME']
+    transport = paramiko.Transport((hostname, port))
+    transport.connect(username=user, pkey=mykey)
+    return paramiko.SFTPClient.from_transport(transport)
 
 
 class SSHRsync(object):
 
-    sftp = None
+    def __init__(self, sftpclient):
+        self.sftpclient = sftpclient
 
-    def __init__(self, hostname, port, user=None):
-        self.hostname = hostname
-        self.port = port
-
-    @connect
-    def get_remote_delta(self, filepath, hashes, sftpclient):
+    def get_remote_delta(self, filepath, hashes):
         """ Returns paramiko.SFTPFile obj. Raises an IOError if the file
             can not be retrieved or is a directory.
         """
-        file = sftpclient.file(filepath)
+        file = self.sftpclient.file(filepath)
         return zyklop.rsync.rsyncdelta(file, hashes)
 
     def get_hashes_for(self, filepath):
@@ -55,8 +44,7 @@ class SSHRsync(object):
                 checksums = zyklop.rsync.blockchecksums(f)
         return checksums
 
-    @connect
-    def get_type(self, path, sftpclient):
+    def get_type(self, path):
         """ Does a stat on the remote system to check if we're dealing
         with a directory or file.
 
@@ -67,13 +55,12 @@ class SSHRsync(object):
         """
         result = DIRECTORY
         try:
-            sftpclient.listdir(path)
+            self.sftpclient.listdir(path)
         except IOError:
             result = FILE
         return result
 
-    @connect
-    def sync_file(self, localpath, remotepath, sftpclient):
+    def sync_file(self, localpath, remotepath):
         """ Syncs a given local file from the given remotepath.
 
         @param localpath: Path to the local file. If the file does not
@@ -101,4 +88,17 @@ class SSHRsync(object):
                     saveto.close()
                     os.rename(newfile, localpath)
         else:
-            sftpclient.get(remotepath, localpath)
+            self.sftpclient.get(remotepath, localpath)
+
+    def sync_directories(self, localpath, remotepath):
+        if not os.path.exists(localpath):
+            os.mkdir(localpath)
+        children = self.sftpclient.listdir(remotepath)
+        for c in children:
+            localfilepath = os.path.join(localpath, c)
+            remotefilepath = os.path.join(remotepath, c)
+            type = self.get_type(remotefilepath)
+            if type == FILE:
+                self.sync_file(localfilepath, remotefilepath)
+            elif type == DIRECTORY:
+                self.sync_directories(localfilepath, remotefilepath)

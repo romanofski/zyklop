@@ -89,7 +89,7 @@ class TestParamikoChildNodeProvider(
 
     def test_get_children_helper(self):
         provider = zyklop.search.ParamikoChildNodeProvider(
-            'localhost', 22)
+            zyklop.ssh.create_sftpclient('localhost', 22))
         children = provider._get_children_helper(self.tempdir)
         self.assertTrue(children)
         self.assertTrue(os.path.join(self.tempdir, 'folder1') in

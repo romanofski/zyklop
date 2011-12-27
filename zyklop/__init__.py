@@ -5,6 +5,7 @@ import paramiko
 import sys
 import zyklop.rsync
 import zyklop.search
+import zyklop.ssh
 
 
 logger = logging.getLogger('zyklop')
@@ -66,7 +67,8 @@ def sync():
         sys.exit(0)
     elif result:
         localdir = os.path.abspath(os.getcwd())
-        rsync = zyklop.ssh.SSHRsync(hostname, port)
+        rsync = zyklop.ssh.SSHRsync(
+            zyklop.ssh.create_sftpclient(hostname, port))
         rsync.sync_file(os.path.join(
             localdir, os.path.basename(result.path)), result.path)
     else:
