@@ -1,23 +1,9 @@
-import os
-import shutil
-import tempfile
-import unittest
+import os.path
 import zyklop.ssh
+import zyklop.tests.base
 
 
-class TestSSHRSync(unittest.TestCase):
-
-    def setUp(self):
-        self.tempdir = tempfile.mkdtemp()
-        src = os.path.join(os.path.dirname(__file__), 'testdata',
-                           'dirtree')
-        for item in os.listdir(src):
-            shutil.copytree(os.path.join(src, item),
-                            os.path.join(self.tempdir, item))
-        self.addCleanup(self.cleanTempDir, self.tempdir)
-
-    def cleanTempDir(self, tempdir):
-        shutil.rmtree(tempdir)
+class TestSSHRSync(zyklop.tests.base.BaseDirectoryTestCase):
 
     def test_get_hashes_for(self):
         rsync = zyklop.ssh.SSHRsync('dummy', 'localhost')

@@ -1,10 +1,9 @@
 import os
 import os.path
 import re
-import shutil
-import tempfile
 import unittest
 import zyklop.search
+import zyklop.tests.base
 
 
 FAKEFSTREE = {'/': dict(
@@ -88,19 +87,8 @@ class TestSearch(unittest.TestCase):
 
 # This test is very environment specific and should be improved if there
 # is time.
-class TestParamikoChildNodeProvider(unittest.TestCase):
-
-    def setUp(self):
-        self.tempdir = tempfile.mkdtemp()
-        src = os.path.join(os.path.dirname(__file__), 'testdata',
-                           'dirtree')
-        for item in os.listdir(src):
-            shutil.copytree(os.path.join(src, item),
-                            os.path.join(self.tempdir, item))
-        self.addCleanup(self.cleanTempDir, self.tempdir)
-
-    def cleanTempDir(self, tempdir):
-        shutil.rmtree(tempdir)
+class TestParamikoChildNodeProvider(
+    zyklop.tests.base.BaseDirectoryTestCase):
 
     def test_get_children_helper(self):
         provider = zyklop.search.ParamikoChildNodeProvider(
