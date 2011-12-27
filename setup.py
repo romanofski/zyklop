@@ -28,7 +28,7 @@ setup(
     ),
     entry_points={
         'console_scripts': [
-            'sync = zyklop.sync:sync',
+            'sync = zyklop.ssh:sync',
         ]
     }
 )
