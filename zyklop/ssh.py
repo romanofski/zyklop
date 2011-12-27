@@ -16,6 +16,17 @@ stdout = logging.StreamHandler(sys.__stdout__)
 logger.addHandler(stdout)
 
 
+def connect(func):
+    def wrapped(*args):
+        obj = args[0]
+        mykey = obj.get_user_pkey()
+        transport = paramiko.Transport((obj.hostname, obj.port))
+        transport.connect(username=obj.user, pkey=mykey)
+        obj.sftp = paramiko.SFTPClient.from_transport(transport)
+        return func(*args)
+    return wrapped
+
+
 class SSHRsync(object):
 
     sftp = None
@@ -25,24 +36,14 @@ class SSHRsync(object):
         self.port = port
         self.user = user and user or os.environ['LOGNAME']
 
-    def connect(self):
-        """ Connects with the remote host via paramiko. Returns
-            paramiko.SFTP
-        """
-        mykey = self.get_user_pkey()
-        transport = paramiko.Transport((self.hostname, self.port))
-        transport.connect(username=self.user, pkey=mykey)
-        self.sftp = paramiko.SFTPClient.from_transport(transport)
-
     def get_user_pkey(self):
         """ Returns the users private key."""
         privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
         return paramiko.RSAKey.from_private_key_file(privatekeyfile)
 
+    @connect
     def get_remote_delta(self, filepath, hashes):
         """ Returns paramiko.SFTPFile obj."""
-        if self.sftp is None:
-            self.connect()
         file = self.sftp.file(filepath)
         return zyklop.rsync.rsyncdelta(file, hashes)
 
@@ -56,6 +57,7 @@ class SSHRsync(object):
                 checksums = zyklop.rsync.blockchecksums(f)
         return checksums
 
+    @connect
     def get_type(self, path):
         """ Does a stat on the remote system to check if we're dealing
         with a directory or file.
@@ -65,9 +67,6 @@ class SSHRsync(object):
         @return: Either FOLDER or FILE constant
         @rtype: int
         """
-        if self.sftp is None:
-            self.connect()
-
         result = DIRECTORY
         try:
             self.sftp.listdir(path)
@@ -75,25 +74,36 @@ class SSHRsync(object):
             result = FILE
         return result
 
-    def sync(self, localpath, remotefile):
-        if os.path.isdir(localpath):
-            localfile = os.path.join(localpath,
-                                     os.path.basename(remotefile))
+    @connect
+    def sync_file(self, localpath, remotepath):
+        """ Syncs a given local file from the given remotepath.
+
+        @param localpath: Path to the local file. If the file does not
+                          exist locally, it will be created by an sftp
+                          get. If the path points to a local directory
+                          an IOError is raised.
+        @type localpath: str
+        @param remotepath: Path to the remote file, which should be a
+                           file, otherwise IOError is raised.
+        """
+        if os.path.exists(localpath):
+            if os.path.isdir(localpath):
+                raise IOError("{0} points to a directory.".format(localpath))
+
+            hashes = self.get_hashes_for(localpath)
+            delta = self.get_remote_delta(remotepath, hashes)
+            newfile = localpath + '.sync'
+            if not os.path.exists(localpath):
+                with open(localpath, 'w') as unpatched:
+                    unpatched.close()
+
+            with open(localpath, 'r') as unpatched:
+                with open(newfile, 'wb') as saveto:
+                    zyklop.rsync.patchstream(unpatched, saveto, delta)
+                    saveto.close()
+                    os.rename(newfile, localpath)
         else:
-            localfile = localpath
-
-        hashes = self.get_hashes_for(localfile)
-        delta = self.get_remote_delta(remotefile, hashes)
-        newfile = localfile + '.sync'
-        if not os.path.exists(localfile):
-            with open(localfile, 'w') as unpatched:
-                unpatched.close()
-
-        with open(localfile, 'r') as unpatched:
-            with open(newfile, 'wb') as saveto:
-                zyklop.rsync.patchstream(unpatched, saveto, delta)
-                saveto.close()
-                os.rename(newfile, localfile)
+            self.sftp.get(remotepath, localpath)
 
 
 def sync():
@@ -151,7 +161,8 @@ def sync():
     elif result:
         localdir = os.path.abspath(os.getcwd())
         rsync = SSHRsync(hostname, port)
-        rsync.sync_files(localdir, result.path)
+        rsync.sync_file(os.path.join(
+            localdir, os.path.basename(result.path)), result.path)
     else:
         print("Nothing found.")
         sys.exit(1)
