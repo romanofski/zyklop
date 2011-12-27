@@ -67,16 +67,13 @@ class TestSearch(unittest.TestCase):
                                      DummyTreeChildNodeProvider())
         # we'll use os.listdir to get the children
         found = search.find()
-        self.assertTrue(len(found), 1)
-        self.assertTrue(found[0].path.endswith('folder1/bin/instance'))
-        self.assertEquals(found[0].level, 2)
+        self.assertTrue(found)
+        self.assertTrue(found.path.endswith('folder1/bin/instance'))
+        self.assertEquals(found.level, 2)
 
         search.regexp = re.compile('^.*bin$')
         found = search.find()
-        self.assertEquals(len(found), 2)
-        found.sort(key=lambda x: x.path)
-        self.assertTrue(found[0].path.endswith('folder1/bin'))
-        self.assertTrue(found[1].path.endswith('folder2/bin'))
+        self.assertTrue(found.path.endswith('folder2/bin'))
 
     def test_noresult(self):
         search = zyklop.search.Search('/', 'foobarnotexist',

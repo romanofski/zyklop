@@ -36,21 +36,16 @@ class Search(object):
             for c in visited:
                 children += self.childnodeprovider.get_children(c)
 
-        found = []
         while children:
             child = children.pop()
             if child in visited:
                 continue
             if self.regexp.search(child):
-                found.append(SearchResult(child, level))
+                return SearchResult(child, level)
             visited.append(child)
 
         level += 1
-        if not found:
-            result = self.find(children, visited, level=level)
-            if result is not None:
-                found += result
-        return found
+        return self.find(children, visited, level=level)
 
 
 class DirectoryChildNodeProvider(object):
