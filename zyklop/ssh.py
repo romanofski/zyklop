@@ -7,6 +7,10 @@ import zyklop.rsync
 import zyklop.search
 
 
+DIRECTORY = 1
+FILE = 2
+
+
 logger = logging.getLogger('zyklop')
 stdout = logging.StreamHandler(sys.__stdout__)
 logger.addHandler(stdout)
@@ -52,7 +56,26 @@ class SSHRsync(object):
                 checksums = zyklop.rsync.blockchecksums(f)
         return checksums
 
-    def sync_files(self, localpath, remotefile):
+    def get_type(self, path):
+        """ Does a stat on the remote system to check if we're dealing
+        with a directory or file.
+
+        @param path: The path to check on the remote system.
+        @type path: str
+        @return: Either FOLDER or FILE constant
+        @rtype: int
+        """
+        if self.sftp is None:
+            self.connect()
+
+        result = DIRECTORY
+        try:
+            self.sftp.listdir(path)
+        except IOError:
+            result = FILE
+        return result
+
+    def sync(self, localpath, remotefile):
         if os.path.isdir(localpath):
             localfile = os.path.join(localpath,
                                      os.path.basename(remotefile))
