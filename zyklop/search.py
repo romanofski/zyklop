@@ -67,5 +67,10 @@ class ParamikoChildNodeProvider(DirectoryChildNodeProvider):
         self.sftpclient = sftpclient
 
     def _get_children_helper(self, abspath):
-        return [os.path.join(abspath, c) for c in\
-                self.sftpclient.listdir(abspath)]
+        try:
+            result = [os.path.join(abspath, c) for c in\
+                      self.sftpclient.listdir(abspath)]
+        except IOError:
+            result = []
+
+        return result

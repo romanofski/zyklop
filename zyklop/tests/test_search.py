@@ -94,3 +94,7 @@ class TestParamikoChildNodeProvider(
         self.assertTrue(children)
         self.assertTrue(os.path.join(self.tempdir, 'folder1') in
                         children)
+
+        filepath = os.path.join(self.tempdir, 'etc', 'file1.txt')
+        self.assertEquals([],
+                          provider._get_children_helper(filepath))
