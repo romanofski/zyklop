@@ -21,7 +21,6 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'fabric',
         'paramiko',
     ],
     extras_require=dict(

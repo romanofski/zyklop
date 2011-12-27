@@ -1,5 +1,4 @@
 import argparse
-import fabric.api
 import logging
 import os
 import paramiko
@@ -61,15 +60,18 @@ def sync():
                          arguments.alias)
                     )
 
-    fabric.api.env.host_string = '{hostname}:{port}'.format(
-        hostname=hostname, port=port)
-    search = zyklop.search.FabricSearch(arguments.path, arguments.match)
-    results = search.find()
+    search = zyklop.search.Search(
+        arguments.path, arguments.match,
+        zyklop.search.ParamikoChildNodeProvider(hostname, port))
+    result = search.find()
     if arguments.dry_run:
-        for i in results:
+        for i in result:
             logger.warning("Found {0} at level {1}".format(i.path, i.level))
         sys.exit(0)
-    else:
+    elif result:
         localdir = os.path.abspath(os.getcwd())
         rsync = zyklop.ssh.SSHRsync(hostname, port)
-        rsync.sync_files(localdir, results[0].path)
+        rsync.sync_files(localdir, result.path)
+    else:
+        print("Nothing found.")
+        sys.exit(1)
