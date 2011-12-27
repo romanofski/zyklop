@@ -1,6 +1,6 @@
-import os.path
-import paramiko
+import os
 import re
+import zyklop.ssh
 
 
 class SearchResult(object):
@@ -62,20 +62,6 @@ class DirectoryChildNodeProvider(object):
         raise NotImplemented("Must be implemented in sublcasses.")
 
 
-def connect(func):
-    def wrapped(*args):
-        childnodeprovider = args[0]
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
-        mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile)
-        ssh.connect(hostname=childnodeprovider.hostname,
-                    port=childnodeprovider.port, pkey=mykey)
-        childnodeprovider.ssh_client = ssh
-        return func(*args)
-    return wrapped
-
-
 class ParamikoChildNodeProvider(DirectoryChildNodeProvider):
 
     ssh_client = None
@@ -85,10 +71,6 @@ class ParamikoChildNodeProvider(DirectoryChildNodeProvider):
         self.hostname = hostname
         self.port = port
 
-    @connect
-    def _get_children_helper(self, abspath):
-        cmd = "ls -1 {0}".format(abspath)
-        stdin, stdout, stderr = self.ssh_client.exec_command(cmd)
-        children = [os.path.join(abspath, c) for c in re.split('\s',
-                                                               stdout.read())]
-        return children
+    @zyklop.ssh.connect
+    def _get_children_helper(self, abspath, sftpclient):
+        return [os.path.join(abspath, c) for c in sftpclient.listdir(abspath)]

@@ -16,14 +16,22 @@ stdout = logging.StreamHandler(sys.__stdout__)
 logger.addHandler(stdout)
 
 
+def get_user_pkey():
+    """ Returns the users private key."""
+    privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
+    return paramiko.RSAKey.from_private_key_file(privatekeyfile)
+
+
 def connect(func):
-    def wrapped(*args):
+    def wrapped(*args, **kwargs):
         obj = args[0]
-        mykey = obj.get_user_pkey()
+        mykey = get_user_pkey()
+        user = os.environ['LOGNAME']
         transport = paramiko.Transport((obj.hostname, obj.port))
-        transport.connect(username=obj.user, pkey=mykey)
-        obj.sftp = paramiko.SFTPClient.from_transport(transport)
-        return func(*args)
+        transport.connect(username=user, pkey=mykey)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        kwargs.update(sftpclient=sftp)
+        return func(*args, **kwargs)
     return wrapped
 
 
@@ -34,12 +42,6 @@ class SSHRsync(object):
     def __init__(self, hostname, port, user=None):
         self.hostname = hostname
         self.port = port
-        self.user = user and user or os.environ['LOGNAME']
-
-    def get_user_pkey(self):
-        """ Returns the users private key."""
-        privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
-        return paramiko.RSAKey.from_private_key_file(privatekeyfile)
 
     @connect
     def get_remote_delta(self, filepath, hashes):
