@@ -73,9 +73,6 @@ def rsyncdelta(datastream, remotesignatures, blocksize=4096):
 
             match = True
             deltaqueue.append(matchblock)
-
-            if datastream.closed:
-                break
             continue
 
         except ValueError:

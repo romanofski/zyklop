@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 
@@ -21,6 +22,7 @@ class Search(object):
         self.top = top
         self.regexp = re.compile(regexp)
         self.childnodeprovider = childnodeprovider
+        self.logger = logging.getLogger('zyklop')
 
     def find(self, children=None, visited=None, level=0):
         """ BFS to find a zope sandbox."""
@@ -37,6 +39,7 @@ class Search(object):
 
         while children:
             child = children.pop()
+            self.logger.debug("Searching {0}.".format(child))
             if child in visited:
                 continue
             if self.regexp.search(child):

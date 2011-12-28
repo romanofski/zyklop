@@ -9,8 +9,10 @@ import zyklop.ssh
 
 
 logger = logging.getLogger('zyklop')
-stdout = logging.StreamHandler(sys.__stdout__)
+stdout = logging.StreamHandler(sys.stdout)
+stdout.setFormatter(logging.Formatter())
 logger.addHandler(stdout)
+logger.setLevel(logging.INFO)
 
 
 def sync():
@@ -62,16 +64,18 @@ def sync():
         zyklop.search.ParamikoChildNodeProvider(
             zyklop.ssh.create_sftpclient(hostname, port)))
     result = search.find()
-    if arguments.dry_run:
-        for i in result:
-            logger.warning("Found {0} at level {1}".format(i.path, i.level))
+    if arguments.dry_run and result:
+        logger.info("Found {0}".format(result.path))
         sys.exit(0)
+
     elif result:
         localdir = os.path.abspath(os.getcwd())
         rsync = zyklop.ssh.SSHRsync(
             zyklop.ssh.create_sftpclient(hostname, port))
-        rsync.sync_file(os.path.join(
+        rsync.sync(os.path.join(
             localdir, os.path.basename(result.path)), result.path)
     else:
-        print("Nothing found.")
+        logger.info("Can't find {arguments.match} under "
+                    "{hostname}:{port}{arguments.path}.".format(
+                        arguments=arguments, hostname=hostname, port=port))
         sys.exit(1)

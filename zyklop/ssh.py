@@ -1,3 +1,4 @@
+import logging
 import os
 import paramiko
 import zyklop.rsync
@@ -26,6 +27,7 @@ class SSHRsync(object):
 
     def __init__(self, sftpclient):
         self.sftpclient = sftpclient
+        self.logger = logging.getLogger('zyklop')
 
     def get_remote_delta(self, filepath, hashes):
         """ Returns paramiko.SFTPFile obj. Raises an IOError if the file
@@ -97,8 +99,16 @@ class SSHRsync(object):
         for c in children:
             localfilepath = os.path.join(localpath, c)
             remotefilepath = os.path.join(remotepath, c)
-            type = self.get_type(remotefilepath)
-            if type == FILE:
-                self.sync_file(localfilepath, remotefilepath)
-            elif type == DIRECTORY:
-                self.sync_directories(localfilepath, remotefilepath)
+            self.sync(localfilepath, remotefilepath)
+
+    def sync(self, localpath, remotepath):
+        """ Synchronises given localpath from remotepath, no matter if
+            the remotepath points to a directory or file.
+        """
+        self.logger.info("{0} => {1}".format(
+            localpath, remotepath))
+        type = self.get_type(remotepath)
+        if type == FILE:
+            self.sync_file(localpath, remotepath)
+        elif type == DIRECTORY:
+            self.sync_directories(localpath, remotepath)
