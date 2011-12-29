@@ -35,6 +35,7 @@ class SSHRsync(object):
         """
         self.logger.info("Creating Patch {0}".format(filepath))
         file = self.sftpclient.file(filepath)
+        file.prefetch()
         return zyklop.rsync.rsyncdelta(file, hashes)
 
     def get_hashes_for(self, filepath):
