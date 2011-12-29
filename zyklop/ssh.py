@@ -110,7 +110,7 @@ class SSHRsync(object):
             the remotepath points to a directory or file.
         """
         self.logger.info("{0} => {1}".format(
-            localpath, remotepath))
+            remotepath, localpath))
         type = self.get_type(remotepath)
         if type == FILE:
             self.sync_file(localpath, remotepath)
