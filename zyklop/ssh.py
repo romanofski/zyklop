@@ -15,7 +15,7 @@ def get_user_pkey():
     return paramiko.RSAKey.from_private_key_file(privatekeyfile)
 
 
-def create_sftpclient(hostname, port):
+def create_sftpclient(hostname, port=22):
     mykey = get_user_pkey()
     user = os.environ['LOGNAME']
     transport = paramiko.Transport((hostname, port))
