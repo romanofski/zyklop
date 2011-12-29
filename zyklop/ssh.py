@@ -1,3 +1,4 @@
+from __future__ import print_function
 import logging
 import os
 import paramiko
@@ -94,7 +95,11 @@ class SSHRsync(object):
                     os.rename(newfile, localpath)
                     self.logger.info("Done.")
         else:
-            self.sftpclient.get(remotepath, localpath)
+            self.sftpclient.get(remotepath, localpath, self._show_progress)
+
+    def _show_progress(self, transferred, total):
+        percent = (transferred * 100 / total)
+        print("{percent}%".format(percent=percent), end='\r')
 
     def sync_directories(self, localpath, remotepath):
         if not os.path.exists(localpath):
