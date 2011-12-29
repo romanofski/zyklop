@@ -33,6 +33,7 @@ class SSHRsync(object):
         """ Returns paramiko.SFTPFile obj. Raises an IOError if the file
             can not be retrieved or is a directory.
         """
+        self.logger.info("Creating Patch {0}".format(filepath))
         file = self.sftpclient.file(filepath)
         return zyklop.rsync.rsyncdelta(file, hashes)
 
@@ -42,6 +43,7 @@ class SSHRsync(object):
         """
         checksums = ([], [])
         if os.path.exists(filepath):
+            self.logger.info("Hashing {0}".format(filepath))
             with open(filepath, 'rb') as f:
                 checksums = zyklop.rsync.blockchecksums(f)
         return checksums
@@ -89,6 +91,7 @@ class SSHRsync(object):
                     zyklop.rsync.patchstream(unpatched, saveto, delta)
                     saveto.close()
                     os.rename(newfile, localpath)
+                    self.logger.info("Done.")
         else:
             self.sftpclient.get(remotepath, localpath)
 
