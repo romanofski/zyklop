@@ -51,7 +51,7 @@ def sync():
     sshconfig.parse(open(os.path.expanduser('~/.ssh/config'), 'r'))
     host = sshconfig.lookup(arguments.alias)
     hostname = host.get('hostname')
-    port = host.get('port', 22)
+    port = int(host.get('port', 22))
 
     if not hostname:
         parser.error("Can't find configuration"
