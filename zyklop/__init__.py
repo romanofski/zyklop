@@ -13,15 +13,20 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library.  If not, see
 # <http://www.gnu.org/licenses/>.
-
 import argparse
 import logging
 import os
 import paramiko
+import subprocess
 import sys
-import zyklop.rsync
 import zyklop.search
 import zyklop.ssh
+
+
+SSH_CMD = 'ssh -l {host.User} -p {host.Port}'
+RSYNC_TEMPL = ('rsync -av -e '
+               '--partial --progress --compress-level=9 '
+               '{host.key}:{remotepath} {localdir}')
 
 
 logger = logging.getLogger('zyklop')
@@ -68,6 +73,7 @@ def sync():
     host = sshconfig.lookup(arguments.alias)
     hostname = host.get('hostname')
     port = int(host.get('port', 22))
+    user = os.environ['LOGNAME']
 
     if not hostname:
         parser.error("Can't find configuration"
@@ -86,10 +92,15 @@ def sync():
 
     elif result:
         localdir = os.path.abspath(os.getcwd())
-        rsync = zyklop.ssh.SSHRsync(
-            zyklop.ssh.create_sftpclient(hostname, port))
-        rsync.sync(os.path.join(
-            localdir, os.path.basename(result.path)), result.path)
+        cmd = RSYNC_TEMPL.format(
+            host=hostname,
+            remotepath=result.path,
+            localdir=localdir).split()
+        ssh_cmd = SSH_CMD.format(user=user, port=port)
+        cmd.insert(3, ssh_cmd)
+
+        logger.info(' '.join(cmd))
+        subprocess.call(cmd)
     else:
         logger.info("Can't find {arguments.match} under "
                     "{hostname}:{port}{arguments.path}.".format(
