@@ -23,10 +23,10 @@ import zyklop.search
 import zyklop.ssh
 
 
-SSH_CMD = 'ssh -l {host.User} -p {host.Port}'
+SSH_CMD = 'ssh -l {user} -p {port}'
 RSYNC_TEMPL = ('rsync -av -e '
                '--partial --progress --compress-level=9 '
-               '{host.key}:{remotepath} {localdir}')
+               '{hostname}:{remotepath} {localdir}')
 
 
 logger = logging.getLogger('zyklop')
@@ -96,7 +96,7 @@ def sync():
     elif result:
         localdir = os.path.abspath(os.getcwd())
         cmd = RSYNC_TEMPL.format(
-            host=hostname,
+            hostname=hostname,
             remotepath=result.path,
             localdir=localdir).split()
         ssh_cmd = SSH_CMD.format(user=user, port=port)
