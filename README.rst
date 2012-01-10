@@ -1,6 +1,11 @@
+========
+ Zyklop
+========
+
 This is an educational/private project only.
 
-This program can be used to sync (hopefully) large files.
+This program can be used to sync (hopefully) large files by using the
+rsync utility.
 
 Motivation
 ==========
@@ -19,11 +24,5 @@ Requirements
 
     * Python >= 2.6 (Python >= 2.7 for tests)
 
-Sync
-====
-
-I've implemented the sync command to be used to synchronize directories
-from servers which are usually huge. It uses currently a breadth-first
-search alorithm to find the wanted directory.
 
 Use --help to see full list of commands.
