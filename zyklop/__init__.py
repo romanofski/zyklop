@@ -70,9 +70,9 @@ def sync():
 
     sshconfig = paramiko.SSHConfig()
     sshconfig.parse(open(os.path.expanduser('~/.ssh/config'), 'r'))
-    host = sshconfig.lookup(arguments.alias)
-    hostname = host.get('hostname')
-    port = int(host.get('port', 22))
+    sshconfighost = sshconfig.lookup(arguments.alias)
+    hostname = sshconfighost.get('hostname')
+    port = int(sshconfighost.get('port', 22))
     user = os.environ['LOGNAME']
 
     if not hostname:
@@ -84,7 +84,7 @@ def sync():
     search = zyklop.search.Search(
         arguments.path, arguments.match,
         zyklop.search.ParamikoChildNodeProvider(
-            zyklop.ssh.create_sftpclient(hostname, port)))
+            zyklop.ssh.create_sftpclient(sshconfighost)))
     result = search.find()
     if arguments.dry_run and result:
         logger.info("Found {0}".format(result.path))

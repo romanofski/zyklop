@@ -14,18 +14,30 @@
 # License along with this library.  If not, see
 # <http://www.gnu.org/licenses/>.
 from __future__ import print_function
+import getpass
 import os
 import paramiko
 
 
-def get_user_pkey():
+def get_user_pkey(sshconfig):
     """ Returns the users private key."""
-    privatekeyfile = os.path.expanduser('~/.ssh/id_rsa')
-    return paramiko.RSAKey.from_private_key_file(privatekeyfile)
+    privatekeyfile = sshconfig.get('identityfile', '~/.ssh/id_rsa')
+    try:
+        key = paramiko.RSAKey.from_private_key_file(
+            os.path.expanduser(privatekeyfile))
+    except paramiko.PasswordRequiredException:
+        keypw = getpass.getpass(
+            "Password for {0}:".format(privatekeyfile))
+        key = paramiko.RSAKey.from_private_key_file(
+            filename=os.path.expanduser(privatekeyfile), password=keypw)
+
+    return key
 
 
-def create_sftpclient(hostname, port=22):
-    mykey = get_user_pkey()
+def create_sftpclient(sshconfig):
+    hostname = sshconfig.get('hostname')
+    port = int(sshconfig.get('port', 22))
+    mykey = get_user_pkey(sshconfig)
     user = os.environ['LOGNAME']
     transport = paramiko.Transport((hostname, port))
     transport.connect(username=user, pkey=mykey)
