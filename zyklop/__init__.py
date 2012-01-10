@@ -60,7 +60,8 @@ def sync():
         "-d",
         "--dry-run",
         dest='dry_run',
-        help=("Dry run. Only show what we found."),
+        help=("Dry run. Shows the found directory. Print's path which"
+              " directory is currently being searched."),
         action="store_true")
 
     arguments = parser.parse_args()
@@ -80,6 +81,8 @@ def sync():
                      " for given alias: {0} in local ~/ssh/config".format(
                          arguments.alias)
                     )
+    if arguments.dry_run:
+        logger.setLevel(logging.DEBUG)
 
     search = zyklop.search.Search(
         arguments.path, arguments.match,
