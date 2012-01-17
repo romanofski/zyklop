@@ -63,6 +63,12 @@ def sync():
         help=("Dry run. Shows the found directory. Print's path which"
               " directory is currently being searched."),
         action="store_true")
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        dest='verbose',
+        help=("Increase logging verbosity to DEBUG"),
+        action="store_true")
 
     arguments = parser.parse_args()
     if not arguments.path or arguments.path == '/':
@@ -81,7 +87,7 @@ def sync():
                      " for given alias: {0} in local ~/ssh/config".format(
                          arguments.alias)
                     )
-    if arguments.dry_run:
+    if arguments.verbose:
         logger.setLevel(logging.DEBUG)
 
     search = zyklop.search.Search(
