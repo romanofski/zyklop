@@ -95,6 +95,12 @@ def sync():
         zyklop.search.ParamikoChildNodeProvider(
             zyklop.ssh.create_sftpclient(sshconfighost)))
     result = search.find()
+    if not result:
+        logger.info("Can't find {arguments.match} under "
+                    "{hostname}:{port}{arguments.path}.".format(
+                        arguments=arguments, hostname=hostname, port=port))
+        sys.exit(1)
+
     while True:
         s = raw_input("Use {0}? Y(es)/N(o)/A(bort) ".format(result.path))
         if s.lower() == 'y':
@@ -120,8 +126,3 @@ def sync():
 
         logger.info(' '.join(cmd))
         subprocess.call(cmd)
-    else:
-        logger.info("Can't find {arguments.match} under "
-                    "{hostname}:{port}{arguments.path}.".format(
-                        arguments=arguments, hostname=hostname, port=port))
-        sys.exit(1)
