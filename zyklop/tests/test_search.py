@@ -88,7 +88,7 @@ class TestSearch(unittest.TestCase):
 
         search.regexp = re.compile('^.*bin$')
         found = search.find()
-        self.assertTrue(found.path.endswith('folder2/bin'))
+        self.assertTrue(found.path.endswith('folder1/bin'))
 
     def test_noresult(self):
         search = zyklop.search.Search('/', 'foobarnotexist',
