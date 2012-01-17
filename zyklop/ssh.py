@@ -15,30 +15,56 @@
 # <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 import getpass
+import logging
 import os
 import paramiko
+import sys
 
 
 def get_user_pkey(sshconfig):
-    """ Returns the users private key."""
-    privatekeyfile = sshconfig.get('identityfile', '~/.ssh/id_rsa')
-    try:
-        key = paramiko.RSAKey.from_private_key_file(
-            os.path.expanduser(privatekeyfile))
-    except paramiko.PasswordRequiredException:
-        keypw = getpass.getpass(
-            "Password for {0}:".format(privatekeyfile))
-        key = paramiko.RSAKey.from_private_key_file(
-            filename=os.path.expanduser(privatekeyfile), password=keypw)
-
-    return key
+    """ Returns a list of private keys. If we find an SSH agent, return
+        these and try to use them to authenticate. Fallback on
+        the identityfile in the sshconfig or ~/.ssh/id_rsa.
+    """
+    keys = paramiko.Agent().get_keys()
+    if not keys:
+        keys = []
+        privatekeyfile = sshconfig.get('identityfile', '~/.ssh/id_rsa')
+        try:
+            key = paramiko.RSAKey.from_private_key_file(
+                os.path.expanduser(privatekeyfile))
+        except paramiko.PasswordRequiredException:
+            keypw = getpass.getpass(
+                "Password for {0}:".format(privatekeyfile))
+            key = paramiko.RSAKey.from_private_key_file(
+                filename=os.path.expanduser(privatekeyfile), password=keypw)
+        keys.append(key)
+    return keys
 
 
 def create_sftpclient(sshconfig):
+    """ Creates a new sftpclient which is authenticated with the host.
+        It tries to authenticate via public key given by the ssh agent of
+        sshconfig file. If that fails, no sftpclient is created and the
+        factory exits with sys.exit(1)
+    """
+    logger = logging.getLogger('zyklop')
     hostname = sshconfig.get('hostname')
     port = int(sshconfig.get('port', 22))
-    mykey = get_user_pkey(sshconfig)
+    mykeys = get_user_pkey(sshconfig)
     user = os.environ['LOGNAME']
     transport = paramiko.Transport((hostname, port))
-    transport.connect(username=user, pkey=mykey)
+    transport.start_client()
+
+    for key in mykeys:
+        try:
+            transport.auth_publickey(username=user, key=key)
+        except paramiko.SSHException, e:
+            # XXX better tell the user?
+            pass
+
+    if not transport.is_authenticated():
+        logger.warn("Key Authentication failed.")
+        sys.exit(1)
+
     return paramiko.SFTPClient.from_transport(transport)
