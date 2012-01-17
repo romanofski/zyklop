@@ -34,7 +34,7 @@ class SearchResult(object):
 
 class Search(object):
 
-    maxdepth = 4
+    maxdepth = 10
 
     def __init__(self, top, regexp, childnodeprovider):
         self.top = top
@@ -48,20 +48,12 @@ class Search(object):
         """
         if level == self.maxdepth:
             return []
+        if visited is None:
+            visited = []
+
         if not children:
             children = collections.deque(
                 self.childnodeprovider.get_children(self.top))
-
-        if visited is None:
-            visited = []
-        else:
-            self.logger.debug("Extending search space.")
-            for c in visited:
-                children.extendleft(
-                    self.childnodeprovider.get_children(c))
-                self.logger.debug(
-                    "By {0} nodes".format(
-                        len(children)))
 
         while children:
             child = children.pop()
@@ -72,6 +64,14 @@ class Search(object):
                 visited.append(child)
                 return SearchResult(child, level, children, visited)
             visited.append(child)
+
+        self.logger.debug("Extending search space.")
+        for c in visited:
+            children.extendleft(
+                self.childnodeprovider.get_children(c))
+            self.logger.debug(
+                "By {0} nodes".format(
+                    len(children)))
 
         level += 1
         return self.find(children, visited, level=level)
