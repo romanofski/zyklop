@@ -95,6 +95,16 @@ def sync():
         zyklop.search.ParamikoChildNodeProvider(
             zyklop.ssh.create_sftpclient(sshconfighost)))
     result = search.find()
+    while True:
+        s = raw_input("Use {0}? Y(es)/N(o)/A(bort) ".format(result.path))
+        if s.lower() == 'y':
+            break
+        elif s.lower() == 'a':
+            sys.exit(0)
+        else:
+            search.top = result.path
+            result = search.find(children=result.children, visited=result.visited)
+
     if arguments.dry_run and result:
         logger.info("Found {0}".format(result.path))
         sys.exit(0)
