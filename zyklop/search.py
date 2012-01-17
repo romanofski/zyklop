@@ -16,13 +16,16 @@
 import logging
 import os
 import re
+import collections
 
 
 class SearchResult(object):
 
-    def __init__(self, path, level):
+    def __init__(self, path, level, children=None, visited=None):
         self.path = path
         self.level = level
+        self.children = children is not None and children or collections.deque()
+        self.visited = visited is not None and visited or []
 
     def __repr__(self):
         return '<{0} object {1}>'.format(
@@ -40,17 +43,25 @@ class Search(object):
         self.logger = logging.getLogger('zyklop')
 
     def find(self, children=None, visited=None, level=0):
-        """ BFS to find a zope sandbox."""
+        """ Performs a BFS and matches every child with the provided
+            regular expression to find the goal node.
+        """
         if level == self.maxdepth:
             return []
         if not children:
-            children = self.childnodeprovider.get_children(self.top)
+            children = collections.deque(
+                self.childnodeprovider.get_children(self.top))
 
         if visited is None:
             visited = []
         else:
+            self.logger.debug("Extending search space.")
             for c in visited:
-                children += self.childnodeprovider.get_children(c)
+                children.extendleft(
+                    self.childnodeprovider.get_children(c))
+                self.logger.debug(
+                    "By {0} nodes".format(
+                        len(children)))
 
         while children:
             child = children.pop()
@@ -58,7 +69,8 @@ class Search(object):
             if child in visited:
                 continue
             if self.regexp.search(child):
-                return SearchResult(child, level)
+                visited.append(child)
+                return SearchResult(child, level, children, visited)
             visited.append(child)
 
         level += 1
