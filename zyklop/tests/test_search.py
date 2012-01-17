@@ -95,23 +95,3 @@ class TestSearch(unittest.TestCase):
                                       DummyTreeChildNodeProvider())
         found = search.find()
         self.assertEquals(found, [])
-
-
-# This test is very environment specific and should be improved if there
-# is time.
-class TestParamikoChildNodeProvider(
-    zyklop.tests.base.BaseDirectoryTestCase):
-
-    def test_get_children_helper(self):
-        provider = zyklop.search.ParamikoChildNodeProvider(
-            zyklop.ssh.create_sftpclient(dict(hostname='localhost',
-                                              port='22'))
-        )
-        children = provider._get_children_helper(self.tempdir)
-        self.assertTrue(children)
-        self.assertTrue(os.path.join(self.tempdir, 'folder1') in
-                        children)
-
-        filepath = os.path.join(self.tempdir, 'etc', 'file1.txt')
-        self.assertEquals([],
-                          provider._get_children_helper(filepath))
