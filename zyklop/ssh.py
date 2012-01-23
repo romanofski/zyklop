@@ -59,7 +59,9 @@ def create_sftpclient(sshconfig):
     for key in mykeys:
         try:
             transport.auth_publickey(username=user, key=key)
-        except paramiko.SSHException, e:
+            if transport.is_authenticated():
+                break
+        except paramiko.SSHException:
             # XXX better tell the user?
             pass
 
