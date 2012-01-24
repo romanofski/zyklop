@@ -2,10 +2,11 @@
  Zyklop
 ========
 
-This is an educational/private project only.
+This program is a wrapper around rsync. It should help you:
 
-This program can be used to sync (hopefully) large files by using the
-rsync utility.
+    * sync files from remote servers
+    * help you finding those files, thus no need to provide exact paths
+      from *where* you sync.
 
 How to Use
 ==========
