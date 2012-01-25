@@ -55,13 +55,6 @@ def sync():
               " path."),
         type=str)
     parser.add_argument(
-        "-d",
-        "--dry-run",
-        dest='dry_run',
-        help=("Dry run. Shows the found directory. Print's path which"
-              " directory is currently being searched."),
-        action="store_true")
-    parser.add_argument(
         "-v",
         "--verbose",
         dest='verbose',
@@ -113,11 +106,7 @@ def sync():
             search.top = result.path
             result = search.find(children=result.children, visited=result.visited)
 
-    if arguments.dry_run and result:
-        logger.info("Found {0}".format(result.path))
-        sys.exit(0)
-
-    elif result:
+    if result:
         localdir = os.path.abspath(os.getcwd())
         cmd = RSYNC_TEMPL.format(
             hostname=hostname,
