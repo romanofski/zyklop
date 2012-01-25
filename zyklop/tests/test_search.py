@@ -32,6 +32,12 @@ FAKEFSTREE = {'/': dict(
 }
 
 
+class FakeSFTPClient(object):
+
+    def listdir(self, abspath):
+        return DummyTreeChildNodeProvider().get_children(abspath)
+
+
 class TestWalkFakeFSTree(unittest.TestCase):
 
     def test_get_children(self):
@@ -112,8 +118,17 @@ class TestDirectoryChildNodeProvider(unittest.TestCase):
             zyklop.search.DirectoryChildNodeProvider().get_children,
             'ignored')
 
-    def test__get_children_helper(self):
         self.assertRaises(
             NotImplementedError,
-            zyklop.search.DirectoryChildNodeProvider()._get_children_helper,
-            'ignored')
+            zyklop.search.DirectoryChildNodeProvider().get_children,
+            '/')
+
+
+class TestParamikoChildNodeProvider(unittest.TestCase):
+
+    def test__get_children_helper(self):
+        provider = zyklop.search.ParamikoChildNodeProvider(
+            FakeSFTPClient())
+        children = provider._get_children_helper('/')
+        expected = ['/folder3', '/folder2', '/folder1']
+        self.assertEquals(expected, children)
