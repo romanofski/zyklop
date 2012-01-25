@@ -42,13 +42,11 @@ def sync():
         epilog=("Use at your own risk and not in production"
                 " environments!!!!".upper()))
     parser.add_argument(
-        'alias', type=unicode,
-        help="Server alias to connect to, specified in your $HOME/.ssh/config")
-    parser.add_argument(
-        "path",
-        help=("A path in the remote filesystem from where to start the"
-              " search. Don't start with the root!"
-              " e.g.: /opt"),
+        "hostpath",
+        help=("A hostname/ssh alias and the path in the remote"
+              " filesystem from where to start the"
+              " search. The delimiter is ':'. Don't start with the root!"
+              " e.g.: myserver:/opt"),
         type=str)
     parser.add_argument(
         "match",
@@ -71,13 +69,14 @@ def sync():
         action="store_true")
 
     arguments = parser.parse_args()
-    if not arguments.path or arguments.path == '/':
+    alias, hostpath = arguments.hostpath.split(':')
+    if not hostpath:
         parser.error(
             "Ehrm - where do you want to search today?")
 
     sshconfig = paramiko.SSHConfig()
     sshconfig.parse(open(os.path.expanduser('~/.ssh/config'), 'r'))
-    sshconfighost = sshconfig.lookup(arguments.alias)
+    sshconfighost = sshconfig.lookup(alias)
     hostname = sshconfighost.get('hostname')
     port = int(sshconfighost.get('port', 22))
     user = os.environ['LOGNAME']
@@ -85,20 +84,23 @@ def sync():
     if not hostname:
         parser.error("Can't find configuration"
                      " for given alias: {0} in local ~/ssh/config".format(
-                         arguments.alias)
+                         alias)
                     )
     if arguments.verbose:
         logger.setLevel(logging.DEBUG)
 
     search = zyklop.search.Search(
-        arguments.path, arguments.match,
+        hostpath, arguments.match,
         zyklop.search.ParamikoChildNodeProvider(
             zyklop.ssh.create_sftpclient(sshconfighost)))
     result = search.find()
     if not result:
         logger.info("Can't find {arguments.match} under "
-                    "{hostname}:{port}{arguments.path}.".format(
-                        arguments=arguments, hostname=hostname, port=port))
+                    "{hostname}:{port}{hostpath}.".format(
+                        arguments=arguments,
+                        hostpath=hostpath,
+                        hostname=hostname,
+                        port=port))
         sys.exit(1)
 
     while True:
