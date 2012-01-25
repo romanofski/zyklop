@@ -95,3 +95,10 @@ class TestSearch(unittest.TestCase):
                                       DummyTreeChildNodeProvider())
         found = search.find()
         self.assertEquals(found, [])
+
+
+class TestSearchResult(unittest.TestCase):
+
+    def test__repr__(self):
+        sr = zyklop.search.SearchResult('/', 2)
+        self.assertEquals('<SearchResult object />', repr(sr))
