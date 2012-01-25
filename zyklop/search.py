@@ -88,7 +88,7 @@ class DirectoryChildNodeProvider(object):
 
     def _get_children_helper(self, abspath):
         """ Helper function which returns a list of children. """
-        raise NotImplemented("Must be implemented in sublcasses.")
+        raise NotImplementedError("Must be implemented in sublcasses.")
 
 
 class ParamikoChildNodeProvider(DirectoryChildNodeProvider):

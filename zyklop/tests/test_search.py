@@ -102,3 +102,18 @@ class TestSearchResult(unittest.TestCase):
     def test__repr__(self):
         sr = zyklop.search.SearchResult('/', 2)
         self.assertEquals('<SearchResult object />', repr(sr))
+
+
+class TestDirectoryChildNodeProvider(unittest.TestCase):
+
+    def test_get_childer(self):
+        self.assertRaises(
+            ValueError,
+            zyklop.search.DirectoryChildNodeProvider().get_children,
+            'ignored')
+
+    def test__get_children_helper(self):
+        self.assertRaises(
+            NotImplementedError,
+            zyklop.search.DirectoryChildNodeProvider()._get_children_helper,
+            'ignored')
