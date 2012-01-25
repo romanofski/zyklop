@@ -50,10 +50,10 @@ def sync():
         type=str)
     parser.add_argument(
         "match",
-        help=("A match string the search is looking for. This can be a"
-              " path. Defaults to: filestorage"),
-        type=str,
-        default="filestorage")
+        help=("A match string the search is matching every file- and"
+              " directory name with. This can be a"
+              " path."),
+        type=str)
     parser.add_argument(
         "-d",
         "--dry-run",
