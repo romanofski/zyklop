@@ -41,8 +41,11 @@ class TreeNode(object):
         self.parent = parent
         self.children = []
 
-    def append(self, path):
-        """ Appends path to the tree."""
+    def traverse(self, path):
+        """ Traverses the given path and appends each directory to the
+            tree as a tree node (leaf). A leaf is not appended if it
+            already exists.
+        """
         segms = collections.deque(path.split('/'))
 
         while (segms):
@@ -56,7 +59,7 @@ class TreeNode(object):
                 continue
             if not node.name in self:
                 self.children.append(node)
-            return node.append('/'.join(segms))
+            return node.traverse('/'.join(segms))
 
     def __getitem__(self, key):
         item = [x for x in self.children if x.name == key]
