@@ -80,6 +80,18 @@ class DummyTreeChildNodeProvider(object):
         return walk(segments, tree)
 
 
+class TestTree(unittest.TestCase):
+
+    def test_append(self):
+        path = '/foo/bar'
+        tree = zyklop.search.TreeNode()
+        tree.append(path)
+        self.assertEquals('/', tree.name)
+        self.assertEquals(1, len(tree.children))
+        self.assertEquals('foo', tree.children[0].name)
+        self.assertEquals('bar', tree.children[0].children[0].name)
+
+
 class TestSearch(unittest.TestCase):
     """ Basic test to test the BFS and DFS searches """
 

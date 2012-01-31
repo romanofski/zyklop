@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library.  If not, see
 # <http://www.gnu.org/licenses/>.
+import collections
 import logging
 import os
 import re
@@ -30,6 +31,27 @@ class SearchResult(object):
     def __repr__(self):
         return '<{0} object {1}>'.format(
             self.__class__.__name__, self.path)
+
+
+class TreeNode(object):
+    """ A search tree node"""
+
+    def __init__(self, name="/", parent=None):
+        self.name = name == "" and "/" or name
+        self.parent = parent
+        self.children = []
+
+    def append(self, path):
+        """ Appends path to the tree."""
+        segms = collections.deque(path.split('/'))
+
+        while (segms):
+            nname = segms.popleft()
+            node = TreeNode(nname, self)
+            if node.name == self.name:
+                continue
+            self.children.append(node)
+            return node.append('/'.join(segms))
 
 
 class Search(object):
