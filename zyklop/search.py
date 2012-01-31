@@ -48,10 +48,24 @@ class TreeNode(object):
         while (segms):
             nname = segms.popleft()
             node = TreeNode(nname, self)
+            try:
+                node = self[node.name]
+            except KeyError:
+                pass
             if node.name == self.name:
                 continue
-            self.children.append(node)
+            if not node.name in self:
+                self.children.append(node)
             return node.append('/'.join(segms))
+
+    def __getitem__(self, key):
+        item = [x for x in self.children if x.name == key]
+        if not item:
+            raise KeyError
+        return item[0]
+
+    def __contains__(self, item):
+        return item in [x.name for x in self.children]
 
 
 class Search(object):

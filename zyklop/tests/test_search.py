@@ -91,6 +91,14 @@ class TestTree(unittest.TestCase):
         self.assertEquals('foo', tree.children[0].name)
         self.assertEquals('bar', tree.children[0].children[0].name)
 
+    def test_append_no_duplicates(self):
+        # Appending similar paths only adds new children
+        tree = zyklop.search.TreeNode()
+        tree.append('/spam/eggs')
+        tree.append('/spam/bacon')
+        self.assertEquals(1, len(tree.children))
+        self.assertEquals(2, len(tree.children[0].children))
+
 
 class TestSearch(unittest.TestCase):
     """ Basic test to test the BFS and DFS searches """
