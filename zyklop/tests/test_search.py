@@ -99,6 +99,13 @@ class TestTree(unittest.TestCase):
         self.assertEquals(1, len(tree.children))
         self.assertEquals(2, len(tree.children[0].children))
 
+    def test___repr__(self):
+        tree = zyklop.search.TreeNode()
+        self.assertEquals('<TreeNode object /@0>', repr(tree))
+        tree.traverse('/spam')
+        tree.traverse('/foo')
+        self.assertEquals('<TreeNode object /@2>', repr(tree))
+
 
 class TestSearch(unittest.TestCase):
     """ Basic test to test the BFS and DFS searches """

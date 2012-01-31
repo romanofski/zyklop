@@ -61,6 +61,10 @@ class TreeNode(object):
                 self.children.append(node)
             return node.traverse('/'.join(segms))
 
+    def __repr__(self):
+        return '<{0} object {1}@{2}>'.format(
+            self.__class__.__name__, self.name, len(self.children))
+
     def __getitem__(self, key):
         item = [x for x in self.children if x.name == key]
         if not item:
