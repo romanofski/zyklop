@@ -42,7 +42,7 @@ def get_user_pkey(sshconfig):
     return keys
 
 
-def create_sftpclient(sshconfig):
+def create_sftpclient(sshconfig, pattern):
     """ Creates a new sftpclient which is authenticated with the host.
         It tries to authenticate via public key given by the ssh agent of
         sshconfig file. If that fails, no sftpclient is created and the
@@ -53,20 +53,30 @@ def create_sftpclient(sshconfig):
     port = int(sshconfig.get('port', 22))
     mykeys = get_user_pkey(sshconfig)
     user = os.environ['LOGNAME']
-    transport = paramiko.Transport((hostname, port))
-    transport.start_client()
+    client = paramiko.SSHClient()
+    client.connect(hostname=hostname,
+                  port=port,
+                  username=user,
+                  key_filename=mykeys)
+    return FakeSFTPClient(client, pattern)
 
-    for key in mykeys:
-        try:
-            transport.auth_publickey(username=user, key=key)
-            if transport.is_authenticated():
-                break
-        except paramiko.SSHException:
-            # XXX better tell the user?
-            pass
 
-    if not transport.is_authenticated():
-        logger.warn("Key Authentication failed.")
-        sys.exit(1)
+class FakeSFTPClient(object):
+    """ SFTPClient which only implements the listdir method. The listdir
+        method supports sudo access and uses a Treenode instance for
+        returning it's childrens.
+    """
+    locate_templ = 'locate -l 500 -r {pattern}'
 
-    return paramiko.SFTPClient.from_transport(transport)
+    def __init__(self, sshclient, pattern):
+        self.sshclient = sshclient
+        self.tree = self._create_tree(pattern)
+
+    def _create_tree(self, pattern):
+        locatecmd = self.locate_templ.format(pattern=pattern)
+        stdin, stdout, stderr = self.sshclient.exec_command(locatecmd)
+
+    def listdir(self, abspath):
+        locatecmd = self.locate_templ.format(pattern=abspath)
+        stdin, stdout, stderr = self.sshclient.exec_command(locatecmd)
+        return []
