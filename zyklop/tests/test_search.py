@@ -94,8 +94,9 @@ class TestTree(unittest.TestCase):
 
     def test_traverse_path(self):
         tree = zyklop.search.TreeNode()
-        tree.traverse_path('/foo/bar')
+        tree.traverse_path('/foo/bar/baz')
         self.assertEquals(1, len(tree.children))
+        self.assertTrue(tree['foo'])
 
         tree.traverse_path('spam')
         self.assertEquals(2, len(tree.children))

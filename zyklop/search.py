@@ -68,7 +68,7 @@ class TreeNode(object):
         """ Traverses given path and appends them to the tree as nodes.
             This is a wrapper method for traverse.
         """
-        result = os.path.split(path)
+        result = path.split('/')
         if os.path.isabs(path):
             result = result[1:]
         return self.traverse(result)
