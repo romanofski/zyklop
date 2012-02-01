@@ -83,27 +83,28 @@ class DummyTreeChildNodeProvider(object):
 class TestTree(unittest.TestCase):
 
     def test_traverse(self):
-        path = '/foo/bar'
         tree = zyklop.search.TreeNode()
-        tree.traverse(path)
+        tree.traverse(['foo', 'bar'])
+        tree.traverse(['foo', 'foo', 'bar'])
         self.assertEquals('/', tree.name)
         self.assertEquals(1, len(tree.children))
-        self.assertEquals('foo', tree.children[0].name)
+        self.assertEquals(2, len(tree['foo'].children))
+        self.assertEquals('foo', tree['foo'].children[1].name)
         self.assertEquals('bar', tree.children[0].children[0].name)
 
     def test_traverse_no_duplicates(self):
         # Appending similar paths only adds new children
         tree = zyklop.search.TreeNode()
-        tree.traverse('/spam/eggs')
-        tree.traverse('/spam/bacon')
+        tree.traverse(['spam', 'eggs'])
+        tree.traverse(['spam', 'bacon'])
         self.assertEquals(1, len(tree.children))
         self.assertEquals(2, len(tree.children[0].children))
 
     def test___repr__(self):
         tree = zyklop.search.TreeNode()
         self.assertEquals('<TreeNode object /@0>', repr(tree))
-        tree.traverse('/spam')
-        tree.traverse('/foo')
+        tree.traverse(['spam'])
+        tree.traverse(['foo'])
         self.assertEquals('<TreeNode object /@2>', repr(tree))
 
 
