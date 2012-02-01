@@ -85,7 +85,7 @@ def sync():
     search = zyklop.search.Search(
         hostpath, arguments.match,
         zyklop.search.ParamikoChildNodeProvider(
-            zyklop.ssh.create_sftpclient(sshconfighost)))
+            zyklop.ssh.create_sftpclient(sshconfighost, arguments.match)))
     result = search.find()
     if not result:
         logger.info("Can't find {arguments.match} under "
