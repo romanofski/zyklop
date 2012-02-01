@@ -15,10 +15,8 @@
 # <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 import getpass
-import logging
 import os
 import paramiko
-import sys
 
 
 def get_user_pkey(sshconfig):
@@ -48,7 +46,6 @@ def create_sftpclient(sshconfig, pattern):
         sshconfig file. If that fails, no sftpclient is created and the
         factory exits with sys.exit(1)
     """
-    logger = logging.getLogger('zyklop')
     hostname = sshconfig.get('hostname')
     port = int(sshconfig.get('port', 22))
     mykeys = get_user_pkey(sshconfig)
