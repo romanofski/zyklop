@@ -42,8 +42,8 @@ class TreeNode(object):
         self.children = []
 
     def traverse(self, segms):
-        """ Traverses the given path and appends each directory to the
-            tree as a tree node (leaf). A leaf is not appended if it
+        """ Traverses the given segments and appends each directory to
+            the tree as a tree node (leaf). A leaf is not appended if it
             already exists.
 
             The path should be already split into segments, eg. /foo/bar
@@ -63,6 +63,15 @@ class TreeNode(object):
                 self.children.append(node)
 
             return node.traverse(segms)
+
+    def traverse_path(self, path):
+        """ Traverses given path and appends them to the tree as nodes.
+            This is a wrapper method for traverse.
+        """
+        result = os.path.split(path)
+        if os.path.isabs(path):
+            result = result[1:]
+        return self.traverse(result)
 
     def __repr__(self):
         return '<{0} object {1}@{2}>'.format(

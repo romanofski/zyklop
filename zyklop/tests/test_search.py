@@ -92,6 +92,17 @@ class TestTree(unittest.TestCase):
         self.assertEquals('foo', tree['foo'].children[1].name)
         self.assertEquals('bar', tree.children[0].children[0].name)
 
+    def test_traverse_path(self):
+        tree = zyklop.search.TreeNode()
+        tree.traverse_path('/foo/bar')
+        self.assertEquals(1, len(tree.children))
+
+        tree.traverse_path('spam')
+        self.assertEquals(2, len(tree.children))
+
+        tree.traverse_path('spam/baz')
+        self.assertEquals(1, len(tree['spam'].children))
+
     def test_traverse_no_duplicates(self):
         # Appending similar paths only adds new children
         tree = zyklop.search.TreeNode()
