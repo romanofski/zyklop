@@ -112,7 +112,7 @@ class TreeNode(object):
 
 class Search(object):
 
-    maxdepth = 10
+    maxdepth = 30
 
     def __init__(self, top, regexp, childnodeprovider):
         self.top = top
@@ -125,7 +125,7 @@ class Search(object):
             regular expression to find the goal node.
         """
         if level == self.maxdepth:
-            return []
+            return
         if visited is None:
             visited = []
 
