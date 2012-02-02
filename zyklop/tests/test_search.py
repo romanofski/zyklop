@@ -151,7 +151,7 @@ class TestSearch(unittest.TestCase):
         search = zyklop.search.Search('/', 'foobarnotexist',
                                       DummyTreeChildNodeProvider())
         found = search.find()
-        self.assertEquals(found, [])
+        self.assertEquals(None, found)
 
 
 class TestSearchResult(unittest.TestCase):
