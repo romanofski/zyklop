@@ -90,6 +90,15 @@ class FakeSFTPClient(object):
         return tree
 
     def listdir(self, abspath):
-        locatecmd = self.locate_templ.format(pattern=abspath)
-        stdin, stdout, stderr = self.sshclient.exec_command(locatecmd)
-        return []
+        segms = abspath.split('/')[1:]
+        segms.reverse()
+        node = None
+
+        while (segms):
+            try:
+                node = self.tree[segms.pop()]
+            except KeyError:
+                break
+
+        children = node.children
+        return [zyklop.search.absolute_path(child) for child in children]

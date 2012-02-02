@@ -29,10 +29,16 @@ class FakeSSHClient(object):
 
 class TestFakeSFTPClient(unittest.TestCase):
 
-    def test__create_tree(self):
+    def setUp(self):
         stdinoutput = StringIO.StringIO("/spam/eggs/baz\n/spam/spam/eggs")
         client = FakeSSHClient((StringIO.StringIO(),
                                 stdinoutput,
                                 StringIO.StringIO()))
-        client = zyklop.ssh.FakeSFTPClient(client, 'eggs')
-        self.assertEquals(2, len(client.tree['spam'].children))
+        self.client = zyklop.ssh.FakeSFTPClient(client, 'eggs')
+
+    def test__create_tree(self):
+        self.assertEquals(2, len(self.client.tree['spam'].children))
+
+    def test_listdir(self):
+        result = self.client.listdir('/spam')
+        self.assertEquals(['/spam/eggs', '/spam/spam'], result)
