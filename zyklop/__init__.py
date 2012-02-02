@@ -42,11 +42,8 @@ def sync():
         epilog=("Use at your own risk and not in production"
                 " environments!!!!".upper()))
     parser.add_argument(
-        "hostpath",
-        help=("A hostname/ssh alias and the path in the remote"
-              " filesystem from where to start the"
-              " search. The delimiter is ':'. Don't start with the root!"
-              " e.g.: myserver:/opt"),
+        "host",
+        help=("A hostname/ssh alias"),
         type=str)
     parser.add_argument(
         "match",
@@ -62,11 +59,8 @@ def sync():
         action="store_true")
 
     arguments = parser.parse_args()
-    alias, hostpath = arguments.hostpath.split(':')
-    if not hostpath:
-        parser.error(
-            "Ehrm - where do you want to search today?")
 
+    alias = arguments.host
     sshconfig = paramiko.SSHConfig()
     sshconfig.parse(open(os.path.expanduser('~/.ssh/config'), 'r'))
     sshconfighost = sshconfig.lookup(alias)
@@ -85,14 +79,14 @@ def sync():
     sftpclient = zyklop.ssh.create_fake_sftpclient(sshconfighost,
                                                    arguments.match)
     search = zyklop.search.Search(
-        hostpath, arguments.match,
+        '/', arguments.match,
         zyklop.search.ParamikoChildNodeProvider(sftpclient))
     result = search.find()
     if not result:
         logger.info("Can't find {arguments.match} under "
                     "{hostname}:{port}{hostpath}.".format(
                         arguments=arguments,
-                        hostpath=hostpath,
+                        hostpath='/',
                         hostname=hostname,
                         port=port))
         sys.exit(1)
