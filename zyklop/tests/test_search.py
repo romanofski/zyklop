@@ -120,6 +120,17 @@ class TestTree(unittest.TestCase):
         self.assertEquals('<TreeNode object /@2>', repr(tree))
 
 
+class TestAbsoluteURL(unittest.TestCase):
+
+    def test_absolute_path(self):
+        tree = zyklop.search.TreeNode()
+        tree.traverse_path('/foo/baz')
+        tree.traverse_path('/foo/bar/baz')
+
+        result = zyklop.search.absolute_path(tree['foo']['baz'])
+        self.assertEquals('/foo/baz', result)
+
+
 class TestSearch(unittest.TestCase):
     """ Basic test to test the BFS and DFS searches """
 

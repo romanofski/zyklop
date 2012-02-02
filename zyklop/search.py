@@ -33,6 +33,29 @@ class SearchResult(object):
             self.__class__.__name__, self.path)
 
 
+def absolute_path(node):
+    segms = absolute_path_helper(node)
+    segms.reverse()
+    return os.path.join(*[x.name for x in segms])
+
+
+def absolute_path_helper(node, segments=None):
+    """ Returns the traversed node segments to create an absolute path
+        in reverse order.
+    """
+    if segments is None:
+        segments = [node]
+
+    parent = node.parent
+    if parent is None:
+        return segments
+    else:
+        segments.append(parent)
+        absolute_path_helper(parent, segments)
+
+    return segments
+
+
 class TreeNode(object):
     """ A search tree node"""
 
