@@ -41,11 +41,11 @@ def get_user_pkey(sshconfig):
     return keys
 
 
-def create_sftpclient(sshconfig, pattern):
-    """ Creates a new sftpclient which is authenticated with the host.
-        It tries to authenticate via public key given by the ssh agent of
-        sshconfig file. If that fails, no sftpclient is created and the
-        factory exits with sys.exit(1)
+def create_fake_sftpclient(sshconfig, pattern):
+    """ Creates a new fake sftpclient which supports 'listdir' only. The
+        client uses a paramiko.SSHClient for executing a locate on the
+        remote system. This is parsed into a tree and can than be used
+        for traversing.
     """
     hostname = sshconfig.get('hostname')
     port = int(sshconfig.get('port', 22))
