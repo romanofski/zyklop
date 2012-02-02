@@ -82,10 +82,10 @@ def sync():
     if arguments.verbose:
         logger.setLevel(logging.DEBUG)
 
+    sftpclient = zyklop.ssh.create_sftpclient(sshconfighost, arguments.match)
     search = zyklop.search.Search(
         hostpath, arguments.match,
-        zyklop.search.ParamikoChildNodeProvider(
-            zyklop.ssh.create_sftpclient(sshconfighost, arguments.match)))
+        zyklop.search.ParamikoChildNodeProvider(sftpclient))
     result = search.find()
     if not result:
         logger.info("Can't find {arguments.match} under "
