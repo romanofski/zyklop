@@ -42,3 +42,6 @@ class TestFakeSFTPClient(unittest.TestCase):
     def test_listdir(self):
         result = self.client.listdir('/spam')
         self.assertEquals(['/spam/eggs', '/spam/spam'], result)
+
+        result = self.client.listdir('/spam/eggs')
+        self.assertEquals(['/spam/eggs/baz'], result)

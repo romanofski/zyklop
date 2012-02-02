@@ -92,11 +92,11 @@ class FakeSFTPClient(object):
     def listdir(self, abspath):
         segms = abspath.split('/')[1:]
         segms.reverse()
-        node = None
+        node = self.tree
 
         while (segms):
             try:
-                node = self.tree[segms.pop()]
+                node = node[segms.pop()]
             except KeyError:
                 break
 
