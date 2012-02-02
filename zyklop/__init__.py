@@ -96,7 +96,7 @@ def sync():
                         port=port))
         sys.exit(1)
 
-    while True:
+    while result:
         s = raw_input("Use {0}? Y(es)/N(o)/A(bort) ".format(result.path))
         if s.lower() == 'y':
             break
