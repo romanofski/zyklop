@@ -69,6 +69,12 @@ def sync():
         dest='verbose',
         help=("Increase logging verbosity to DEBUG"),
         action="store_true")
+    parser.add_argument(
+        "-s",
+        "--use-sudo",
+        dest='usesudo',
+        help=("Use sudo rights to copy/search on the remote server."),
+        action="store_true")
 
     arguments = parser.parse_args()
 
@@ -91,7 +97,8 @@ def sync():
         logger.setLevel(logging.DEBUG)
 
     sftpclient = zyklop.ssh.create_fake_sftpclient(sshconfighost,
-                                                   arguments.match)
+                                                   arguments.match,
+                                                   use_sudo=arguments.usesudo)
     search = zyklop.search.Search(
         '/', arguments.match,
         zyklop.search.ParamikoChildNodeProvider(sftpclient))

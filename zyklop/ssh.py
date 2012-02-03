@@ -41,7 +41,7 @@ def get_user_pkey(sshconfig):
     return keys
 
 
-def create_fake_sftpclient(sshconfig, pattern):
+def create_fake_sftpclient(sshconfig, pattern, **kw):
     """ Creates a new fake sftpclient which supports 'listdir' only. The
         client uses a paramiko.SSHClient for executing a locate on the
         remote system. This is parsed into a tree and can than be used
@@ -64,7 +64,7 @@ def create_fake_sftpclient(sshconfig, pattern):
                 break
         except paramiko.SSHException:
             continue
-    return FakeSFTPClient(client, pattern)
+    return FakeSFTPClient(client, pattern, **kw)
 
 
 class FakeSFTPClient(object):
@@ -72,14 +72,18 @@ class FakeSFTPClient(object):
         method supports sudo access and uses a Treenode instance for
         returning it's childrens.
     """
-    locate_templ = 'locate -l 500 -r {pattern}'
+    locate_templ = '{sudo} locate -l 500 -r {pattern}'
 
-    def __init__(self, sshclient, pattern):
+    def __init__(self, sshclient, pattern, use_sudo=False):
         self.sshclient = sshclient
-        self.tree = self._create_tree(pattern)
+        self.tree = self._create_tree(pattern, use_sudo)
 
-    def _create_tree(self, pattern):
-        locatecmd = self.locate_templ.format(pattern=pattern)
+    def _create_tree(self, pattern, use_sudo):
+        sudo = use_sudo and 'sudo' or ''
+        locatecmd = self.locate_templ.format(sudo=sudo, pattern=pattern)
+        locatecmd = locatecmd.strip()
+        channel = self.sshclient.invoke_shell()
+        channel.send(locatecmd)
         stdin, stdout, stderr = self.sshclient.exec_command(locatecmd)
         error = stderr.read()
         if error:
