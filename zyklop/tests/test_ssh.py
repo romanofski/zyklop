@@ -29,19 +29,42 @@ class FakeSSHClient(object):
 
 class TestFakeSFTPClient(unittest.TestCase):
 
-    def setUp(self):
-        stdinoutput = StringIO.StringIO("/spam/eggs/baz\n/spam/spam/eggs")
-        client = FakeSSHClient((StringIO.StringIO(),
-                                stdinoutput,
-                                StringIO.StringIO()))
-        self.client = zyklop.ssh.FakeSFTPClient(client, 'eggs')
+    def create_FakeSSHClient(self, tuples):
+        """ returns a fake sshclient which has been instantiated with a
+            triple of StringIO instances for stdin, stout, stderr
+            respectively.
+        """
+        client = FakeSSHClient(tuples)
+        return zyklop.ssh.FakeSFTPClient(client, 'eggs')
 
     def test__create_tree(self):
-        self.assertEquals(2, len(self.client.tree['spam'].children))
+        client = self.create_FakeSSHClient(
+            (StringIO.StringIO(),
+             StringIO.StringIO("/spam/eggs/baz\n/spam/spam/eggs"),
+             StringIO.StringIO()
+            )
+        )
+        self.assertEquals(2, len(client.tree['spam'].children))
 
     def test_listdir(self):
-        result = self.client.listdir('/spam')
+        client = self.create_FakeSSHClient(
+            (StringIO.StringIO(),
+             StringIO.StringIO("/spam/eggs/baz\n/spam/spam/eggs"),
+             StringIO.StringIO()
+            )
+        )
+        result = client.listdir('/spam')
         self.assertEquals(['/spam/eggs', '/spam/spam'], result)
 
-        result = self.client.listdir('/spam/eggs')
+        result = client.listdir('/spam/eggs')
         self.assertEquals(['/spam/eggs/baz'], result)
+
+    def test_listdir_error(self):
+        self.assertRaises(
+            OSError,
+            self.create_FakeSSHClient,
+            (StringIO.StringIO(),
+             StringIO.StringIO(""),
+             StringIO.StringIO("Something shitty happened")
+            )
+        )
