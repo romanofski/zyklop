@@ -81,7 +81,12 @@ class FakeSFTPClient(object):
     def _create_tree(self, pattern):
         locatecmd = self.locate_templ.format(pattern=pattern)
         stdin, stdout, stderr = self.sshclient.exec_command(locatecmd)
-        errors = stderr.read()
+        error = stderr.read()
+        if error:
+            raise OSError(
+                "An error occured during initialisation: {error}".format(
+                    error=error))
+
         paths = stdout.readlines()
         tree = zyklop.search.TreeNode()
         for path in paths:
