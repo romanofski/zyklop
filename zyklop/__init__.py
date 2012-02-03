@@ -69,10 +69,12 @@ def sync():
     user = os.environ['LOGNAME']
 
     if not hostname:
-        parser.error("Can't find configuration"
-                     " for given alias: {0} in local ~/ssh/config".format(
-                         alias)
+        logger.warn("Can't find configuration"
+                    " for given alias: {alias} in local"
+                    " ~/ssh/config. Using it as {hostname}:{port}".format(
+                        alias=alias, hostname=alias, port=port)
                     )
+        sshconfighost.update(hostname=alias)
     if arguments.verbose:
         logger.setLevel(logging.DEBUG)
 
