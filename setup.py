@@ -24,7 +24,7 @@ setup(
         'paramiko',
     ],
     extras_require=dict(
-        test=['mocker', ]
+        test=['Twisted', 'pyasn1']
     ),
     entry_points={
         'console_scripts': [

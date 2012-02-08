@@ -16,6 +16,7 @@
 import unittest
 import StringIO
 import zyklop.ssh
+import zyklop.testing
 
 
 class FakeSSHClient(object):
@@ -27,7 +28,12 @@ class FakeSSHClient(object):
         return self.cmdoutput
 
 
+sshserverlayer = zyklop.testing.SSHServerLayer()
+
+
 class TestFakeSFTPClient(unittest.TestCase):
+
+    layer = sshserverlayer
 
     def setUp(self):
         stdinoutput = StringIO.StringIO("/spam/eggs/baz\n/spam/spam/eggs")
