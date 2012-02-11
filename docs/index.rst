@@ -3,23 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-==========
- Zyklop ◎
-==========
 
-This program is a wrapper around rsync. It should help you:
+..  module:: zyklop
+    :synopsis: Find to sync large files
 
-    * if you need to sync files from remote server frequently
-    * No need to keep the location of the file in your mind. It finds
-      them for you.
-
-
-.. include:: ../README.rst
-
-Contents:
+..  moduleauthor:: Róman Joost <roman@bromeco.de>
 
 .. toctree::
    :maxdepth: 2
+
+.. include:: ../README.rst
 
 Indices and tables
 ==================

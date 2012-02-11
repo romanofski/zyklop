@@ -12,20 +12,20 @@ Example Use Case
 ================
 
 Suppose on server named myserver.foobar.com you have a big file you'd
-like to sync. So what you have is:
+like to sync. So what you have is::
 
     Hostname: myserver.foobar.com
     Alias: myserver (Entry in your ~/.ssh/config)
     Correct Path to the file: /opt/big/deployment/foo/bar/myfileordirectorytocopy
 
 To sync now the `myfileordirectorytocopy` from the server, you would
-invoke zyklop like:
+invoke zyklop like::
 
     $ zyklop myserver myfileordirectory
 
 The second argument can be a regular expression to determine the match.
 
-Use *-v* to see what's happening.
+Use ``-v`` to see what's happening.
 
 Motivation
 ==========
@@ -59,4 +59,4 @@ Requirements
     * locate installed with up-to-date database on the remote system
 
 
-Use --help to see full list of commands.
+Use ``--help`` to see full list of commands.
