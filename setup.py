@@ -5,7 +5,7 @@ version = '0.1'
 setup(
     name='zyklop',
     version=version,
-    description="Administrate servers",
+    description="Find to sync large files",
     long_description="",
     classifiers=[
         "Programming Language :: Python 3",
