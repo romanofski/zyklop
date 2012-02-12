@@ -2,7 +2,7 @@
  Zyklop ◎
 ==========
 
-This program is a wrapper around rsync. It should help you:
+This program is a wrapper around rsync. It will help you:
 
     * if you need to sync files from remote server frequently
     * No need to keep the location of the file in your mind. It finds
@@ -56,13 +56,13 @@ binary patch makes updating my local database a quick thing.
 To summarize, with zyklop I'd like to address two things:
 
     1. Downloading large ZODBs takes a long time and
-       bandwith. I simply don't want to wait that long.
+       bandwith. I simply don't want to wait that long and download that
+       much.
     2. Most of the time I can not remember the exact path where the item
        to copy is on the remote server.
 
 
-Not supported ATM
-=================
+TODO
+====
 
-    * Commands are executed with user rights on the server. No sudo
-      supported.
+    * Sudo Support, so that paths can be rsynced with no direct access.
