@@ -37,6 +37,10 @@ logger.setLevel(logging.INFO)
 
 
 def sync():
+    """ Entry point which parses given arguments, searches for a
+        file/directory to sync on the remote server and passes it on to
+        rsync.
+    """
     parser = argparse.ArgumentParser(
         description="Uses rsync to sync directories",
         epilog=("Use at your own risk and not in production"

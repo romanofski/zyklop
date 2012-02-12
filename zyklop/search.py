@@ -33,6 +33,9 @@ class SearchResult(object):
 
 
 def absolute_path(node):
+    """ Helper function to traverse a given :obj:`TreeNode` and returns an
+        absolute path.
+    """
     segms = absolute_path_helper(node)
     segms.reverse()
     return os.path.join(*[x.name for x in segms])
@@ -56,7 +59,17 @@ def absolute_path_helper(node, segments=None):
 
 
 class TreeNode(object):
-    """ A search tree node"""
+    """ A node in an abstract directory tree.
+
+        The tree will degrade to a linked list and is not balanced, nor
+        weightened. All nodes are inserted based on their name.
+        Duplicates are not inserted.
+
+        Top most node is labeled with :attr:`/`.
+
+        The :class:`TreeNode` supports access to children via the
+        ``__getitem__`` method and comparisons with ``__contains__``.
+    """
 
     def __init__(self, name="/", parent=None):
         self.name = name == "" and "/" or name
@@ -65,11 +78,11 @@ class TreeNode(object):
 
     def traverse(self, segms):
         """ Traverses the given segments and appends each directory to
-            the tree as a tree node (leaf). A leaf is not appended if it
-            already exists.
+            the tree as a :obj:`TreeNode` (leaf). A leaf is not appended
+            if it already exists.
 
-            The path should be already split into segments, eg. /foo/bar
-            should be passed as: ['foo', 'bar']
+            The path should be already split into segments, eg.
+            ``/foo/bar`` should be passed as: ``['foo', 'bar']``
         """
         segms = collections.deque(segms)
 
@@ -87,8 +100,9 @@ class TreeNode(object):
             return node.traverse(segms)
 
     def traverse_path(self, path):
-        """ Traverses given path and appends them to the tree as nodes.
-            This is a wrapper method for traverse.
+        """ Traverses given path and appends them to the tree as
+            :obj:`TreeNodes`.
+            This is a wrapper method for :meth:`traverse`.
         """
         result = path.split('/')
         if os.path.isabs(path):
