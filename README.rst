@@ -8,24 +8,41 @@ This program is a wrapper around rsync. It should help you:
     * No need to keep the location of the file in your mind. It finds
       them for you.
 
-Example Use Case
-================
+Requirements
+==============
 
-Suppose on server named myserver.foobar.com you have a big file you'd
-like to sync. So what you have is::
+    * Python >= 2.6 (Python >= 2.7 for tests)
+    * rsync installed
+    * locate installed with up-to-date database on the remote system
 
-    Hostname: myserver.foobar.com
-    Alias: myserver (Entry in your ~/.ssh/config)
-    Correct Path to the file: /opt/big/deployment/foo/bar/myfileordirectorytocopy
+SSH Configuration
+-----------------
 
-To sync now the `myfileordirectorytocopy` from the server, you would
-invoke zyklop like::
+Make sure you have an SSH configuration file in your ``$HOME``
+directory. This tends to be very useful, as it keeps all necessary
+logins and ssh server access configurations, e.g.::
 
-    $ zyklop myserver myfileordirectory
+    Host spameggs
+    Hostname  12.112.11.122
+    Compression yes
+    CompressionLevel 9
+    User guido
 
-The second argument can be a regular expression to determine the match.
+    Host example2
+    HostName example2.examples.com
+    User johndoe
+    Port 22
 
-Use ``-v`` to see what's happening.
+Examples
+========
+
+..  note::
+    Reusing server definitions from SSH Configuration.
+
+Syning ZODB from remote server configured in ``~/.ssh/config`` as
+spameggs::
+
+    $ zyklop spameggs Data.fs
 
 Motivation
 ==========
@@ -49,14 +66,3 @@ Not supported ATM
 
     * Commands are executed with user rights on the server. No sudo
       supported.
-
-
-Requirements
-==============
-
-    * Python >= 2.6 (Python >= 2.7 for tests)
-    * rsync installed
-    * locate installed with up-to-date database on the remote system
-
-
-Use ``--help`` to see full list of commands.

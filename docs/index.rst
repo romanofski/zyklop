@@ -14,6 +14,24 @@
 
 .. include:: ../README.rst
 
+API
+===
+
+.. automodule:: zyklop
+    :members:
+
+SSH
+---
+
+.. automodule:: zyklop.ssh
+    :members:
+
+Implemented Search
+------------------
+
+.. automodule:: zyklop.search
+    :members:
+
 Indices and tables
 ==================
 
