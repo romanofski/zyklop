@@ -4,10 +4,8 @@
    contain the root `toctree` directive.
 
 
-..  module:: zyklop
-    :synopsis: Find to sync large files
-
 ..  moduleauthor:: Róman Joost <roman@bromeco.de>
+..  default-domain:: py
 
 .. toctree::
    :maxdepth: 2
