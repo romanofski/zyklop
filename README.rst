@@ -39,7 +39,7 @@ Examples
 ..  note::
     Reusing server definitions from SSH Configuration.
 
-Syning ZODB from remote server configured in ``~/.ssh/config`` as
+Syncing ZODB from remote server configured in ``~/.ssh/config`` as
 spameggs::
 
     $ zyklop spameggs Data.fs
@@ -56,7 +56,7 @@ binary patch makes updating my local database a quick thing.
 To summarize, with zyklop I'd like to address two things:
 
     1. Downloading large ZODBs takes a long time and
-       bandwith. I simply don't want to wait that long and download that
+       bandwidth. I simply don't want to wait that long and download that
        much.
     2. Most of the time I can not remember the exact path where the item
        to copy is on the remote server.
