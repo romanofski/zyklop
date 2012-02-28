@@ -14,7 +14,7 @@ setup(
     keywords='server',
     author='Roman Joost',
     author_email='roman@bromeco.de',
-    url='',
+    url='http://zyklop.rtfd.org',
     license='GPL',
     packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,
