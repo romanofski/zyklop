@@ -67,3 +67,10 @@ TODO
 
     * sudo support on the remote server
     * support for copying if SSH expects a terminal
+
+Development
+===========
+
+If you're interested in hacking, clone zyklop on github:
+
+     https://github.com/romanofski/zyklop
