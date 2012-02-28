@@ -47,7 +47,7 @@ class ThreadedTwistedReactor(object):
     """ Wrapper class to run the twisted reactor in another thread for
         tests to run against.
     """
-
+    port = 5022
     run = True
 
     def run_until_shutdown(self):
@@ -57,7 +57,7 @@ class ThreadedTwistedReactor(object):
             twisted.conch.checkers.SSHPublicKeyDatabase())
         UnixSSHdFactory.portal = portal
 
-        twisted.internet.reactor.listenTCP(5022, UnixSSHdFactory())
+        twisted.internet.reactor.listenTCP(self.port, UnixSSHdFactory())
         twisted.internet.reactor.run(
             installSignalHandlers=0)
 
@@ -88,3 +88,6 @@ class SSHServerLayer(object):
     def tearDown(self):
         self.treactor.shutdown()
         self.reactor_thread.join(timeout=1.25)
+
+
+sshserverlayer = SSHServerLayer()

@@ -28,12 +28,9 @@ class FakeSSHClient(object):
         return self.cmdoutput
 
 
-sshserverlayer = zyklop.testing.SSHServerLayer()
-
-
 class TestFakeSFTPClient(unittest.TestCase):
 
-    layer = sshserverlayer
+    layer = zyklop.testing.sshserverlayer
 
     def setUp(self):
         stdinoutput = StringIO.StringIO("/spam/eggs/baz\n/spam/spam/eggs")
@@ -51,3 +48,7 @@ class TestFakeSFTPClient(unittest.TestCase):
 
         result = self.client.listdir('/spam/eggs')
         self.assertEquals(['/spam/eggs/baz'], result)
+
+    def test_real_ssh_listdir(self):
+        config = dict(hostname='localhost', port=self.layer.treactor.port)
+        client = zyklop.ssh.create_fake_sftpclient(config, 'test')
