@@ -12,7 +12,7 @@ setup(
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License (GPL)",
-        "Programming Language :: Python 2.7",
+        "Programming Language :: Python",
         "Topic :: Internet",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: System :: Archiving :: Backup",
