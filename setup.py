@@ -1,3 +1,4 @@
+# coding: utf-8
 from setuptools import setup, find_packages
 
 version = '0.1'
@@ -6,13 +7,20 @@ setup(
     name='zyklop',
     version=version,
     description="Find to sync large files",
-    long_description="",
+    long_description=open("README.rst").read(),
     classifiers=[
-        "Programming Language :: Python 3",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Programming Language :: Python 2.7",
+        "Topic :: Internet",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: System :: Archiving :: Backup",
+        "Topic :: System :: Archiving :: Mirroring",
+        "Topic :: System :: Systems Administration",
     ],
     keywords='server',
-    author='Roman Joost',
+    author='Róman Joost',
     author_email='roman@bromeco.de',
     url='http://zyklop.rtfd.org',
     license='GPL',

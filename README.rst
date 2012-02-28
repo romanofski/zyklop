@@ -65,4 +65,5 @@ To summarize, with zyklop I'd like to address two things:
 TODO
 ====
 
-    * Sudo Support, so that paths can be rsynced with no direct access.
+    * sudo support on the remote server
+    * support for copying if SSH expects a terminal
