@@ -56,6 +56,12 @@ def sync():
               " path."),
         type=str)
     parser.add_argument(
+        "destination",
+        help=("A path to which the matching file should be copied to."
+              " Defaults to `.`"),
+        type=str,
+        default=os.path.abspath(os.getcwd()))
+    parser.add_argument(
         "-v",
         "--verbose",
         dest='verbose',
@@ -108,7 +114,7 @@ def sync():
             result = search.find(children=result.children, visited=result.visited)
 
     if result:
-        localdir = os.path.abspath(os.getcwd())
+        localdir = arguments.destination
         cmd = RSYNC_TEMPL.format(
             hostname=hostname,
             remotepath=result.path,
