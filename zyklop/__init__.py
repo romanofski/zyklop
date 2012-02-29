@@ -52,8 +52,10 @@ def sync():
     parser.add_argument(
         "match",
         help=("A match string the search is matching every file- and"
-              " directory name with. This can be a"
-              " path."),
+              " directory name with. Each directory on the remote server"
+              " is split into segments. Each segment is matched against"
+              " the given `match` argument."
+              ),
         type=str)
     parser.add_argument(
         "destination",
