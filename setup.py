@@ -7,7 +7,10 @@ setup(
     name='zyklop',
     version=version,
     description="Find to sync large files",
-    long_description=open("README.rst").read(),
+    long_description=(
+        open("README.rst").read() + '\n\n' +
+        open("docs/CHANGES.txt").read()
+    ),
     classifiers=[
         "Environment :: Console",
         "Intended Audience :: Developers",

@@ -11,6 +11,7 @@
    :maxdepth: 2
 
 .. include:: ../README.rst
+.. include:: CHANGES.txt
 
 API
 ===
