@@ -40,9 +40,23 @@ Examples
     Reusing server definitions from SSH Configuration.
 
 Syncing ZODB from remote server configured in ``~/.ssh/config`` as
-spameggs::
+spameggs. We choose not the first database, but the second::
 
+    $ pwd
+    /home/roman/projects/plone4/var/filestorage
     $ zyklop spameggs Data.fs
+    Use /opt/otherbuildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) n
+    Use /opt/buildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) y
+    rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/filestorage/Data.fs /home/roman/projects/plone4/var/filestorage
+
+Syncing a directory which ends with blobstorage, and not directories
+like blobstorage.old from a remote server::
+
+    $ pwd
+    /home/roman/projects/plone4/var/blobstorage
+    $ zyklop spameggs blobstorage$
+    Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
+    rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
 Motivation
 ==========
