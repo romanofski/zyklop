@@ -33,6 +33,7 @@ setup(
     install_requires=[
         'setuptools',
         'paramiko',
+        'argparse',
     ],
     extras_require=dict(
         test=['mocker', ]
