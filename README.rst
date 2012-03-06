@@ -44,7 +44,7 @@ spameggs. We choose not the first database, but the second::
 
     $ pwd
     /home/roman/projects/plone4/var/filestorage
-    $ zyklop spameggs Data.fs
+    $ zyklop spameggs Data.fs .
     Use /opt/otherbuildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) n
     Use /opt/buildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) y
     rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/filestorage/Data.fs /home/roman/projects/plone4/var/filestorage
@@ -54,9 +54,16 @@ like blobstorage.old from a remote server::
 
     $ pwd
     /home/roman/projects/plone4/var/blobstorage
-    $ zyklop spameggs blobstorage$
+    $ zyklop spameggs blobstorage$ .
     Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
     rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
+
+Syncing a directory which needs higher privileges. We issue everything
+by using ``sudo``::
+
+    $ zyklop -s spameggs blobstorage$ .
+    Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
+    rsync -av -e ssh -l roman -p 522 --rsync-path=sudo rsync --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
 Motivation
 ==========
@@ -79,8 +86,8 @@ To summarize, with zyklop I'd like to address two things:
 TODO
 ====
 
-    * sudo support on the remote server
-    * support for copying if SSH expects a terminal
+    * tty support: sometimes needed if SSH is configured to only allow
+      tty's to connect.
 
 Development
 ===========
