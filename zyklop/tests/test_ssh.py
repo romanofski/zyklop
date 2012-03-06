@@ -26,6 +26,15 @@ class FakeSSHClient(object):
     def exec_command(self, cmd):
         return self.cmdoutput
 
+    def invoke_shell(self):
+        return FakeChannel()
+
+
+class FakeChannel(object):
+
+    def send(self, cmd):
+        pass
+
 
 class TestFakeSFTPClient(unittest.TestCase):
 
