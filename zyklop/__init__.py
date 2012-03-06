@@ -130,6 +130,8 @@ def sync():
             localdir=localdir).split()
         ssh_cmd = SSH_CMD.format(user=user, port=port)
         cmd.insert(3, ssh_cmd)
+        if arguments.usesudo:
+            cmd.insert(4, '--rsync-path=sudo rsync')
 
         logger.info(' '.join(cmd))
         subprocess.call(cmd)
