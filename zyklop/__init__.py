@@ -79,8 +79,15 @@ def sync():
     arguments = parser.parse_args()
 
     alias = arguments.host
+
+    sshconfigfile = os.path.expanduser('~/.ssh/config')
+    if not os.path.exists(sshconfigfile):
+        logger.error("Can't find your ssh configuration under "
+                     " ~/.ssh/config.")
+        sys.exit(1)
+
     sshconfig = paramiko.SSHConfig()
-    sshconfig.parse(open(os.path.expanduser('~/.ssh/config'), 'r'))
+    sshconfig.parse(open(sshconfigfile, 'r'))
     sshconfighost = sshconfig.lookup(alias)
     hostname = sshconfighost.get('hostname')
     port = int(sshconfighost.get('port', 22))
