@@ -1,10 +1,10 @@
 CHANGES
 =======
 
-0.2 (unreleased)
+0.2 (2012-03-08)
 ----------------
 
-    * Added basic support for issuing sudo commands
+    * Added basic support for using sudo in finding and syncing (rsync)
     * Added argparse as dependency as Python 2.6 won't have it
     * New positional argument to provide destination to copy
       file/directory
