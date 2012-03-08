@@ -58,8 +58,8 @@ like blobstorage.old from a remote server::
     Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
     rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
-Syncing a directory which needs higher privileges. We issue everything
-by using ``sudo``::
+Syncing a directory which needs higher privileges. We use the ``-s``
+argument::
 
     $ zyklop -s spameggs blobstorage$ .
     Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
