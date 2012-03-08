@@ -25,7 +25,7 @@ import zyklop.ssh
 
 SSH_CMD = 'ssh -l {user} -p {port}'
 RSYNC_TEMPL = ('rsync -av -e '
-               '--partial --progress --compress-level=9 '
+               '-P --compress-level=9 '
                '{hostname}:{remotepath} {localdir}')
 
 
