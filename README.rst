@@ -82,12 +82,12 @@ To summarize, with zyklop I'd like to address two things:
     2. Most of the time I can not remember the exact path where the item
        to copy is on the remote server.
 
-
 TODO
 ====
 
     * tty support: sometimes needed if SSH is configured to only allow
       tty's to connect.
+    * Don't hang if only password auth is configured for SSH
 
 Development
 ===========
