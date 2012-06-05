@@ -17,6 +17,7 @@ import argparse
 import logging
 import os
 import paramiko
+import shlex
 import subprocess
 import sys
 import zyklop.search
@@ -26,7 +27,7 @@ import zyklop.ssh
 SSH_CMD = 'ssh -l {user} -p {port}'
 RSYNC_TEMPL = ('rsync -av -e '
                '-P --compress-level=9 '
-               '{hostname}:{remotepath} {localdir}')
+               '{hostname}:"{remotepath}" {localdir}')
 
 
 logger = logging.getLogger('zyklop')
@@ -34,6 +35,20 @@ stdout = logging.StreamHandler(sys.stdout)
 stdout.setFormatter(logging.Formatter())
 logger.addHandler(stdout)
 logger.setLevel(logging.INFO)
+
+
+def get_command(sudo=False, **kw):
+    """ Formats the template string and returns subprocess compatible
+        command.
+    """
+    remotepath = kw.get('remotepath')
+    cmd = RSYNC_TEMPL.format(**kw)
+    ssh_cmd = SSH_CMD.format(**kw)
+    cmd = shlex.split(cmd)
+    cmd.insert(3, ssh_cmd)
+    if sudo:
+        cmd.insert(4, '--rsync-path=sudo rsync')
+    return cmd
 
 
 def sync():
@@ -120,25 +135,24 @@ def sync():
         sys.exit(1)
 
     while result:
-        s = raw_input("Use {0}? Y(es)/N(o)/A(bort) ".format(result.path))
+        s = raw_input("Use {0}? (Y)es/(N)o/(A)bort ".format(result.path))
         if s.lower() == 'y':
             break
         elif s.lower() == 'a':
             sys.exit(0)
         else:
             search.top = result.path
-            result = search.find(children=result.children, visited=result.visited)
+            result = search.find(children=result.children,
+                                 visited=result.visited)
 
     if result:
         localdir = arguments.destination
-        cmd = RSYNC_TEMPL.format(
+        cmd = get_command(arguments.usesudo, **dict(
             hostname=hostname,
             remotepath=result.path,
-            localdir=localdir).split()
-        ssh_cmd = SSH_CMD.format(user=user, port=port)
-        cmd.insert(3, ssh_cmd)
-        if arguments.usesudo:
-            cmd.insert(4, '--rsync-path=sudo rsync')
-
+            localdir=localdir,
+            user=user,
+            port=port)
+            )
         logger.info(' '.join(cmd))
         subprocess.call(cmd)
