@@ -4,6 +4,9 @@ CHANGES
 0.3 (unreleased)
 ----------------
 
+    * Changed host, match parameters: Now you can specify the source
+      host and path match in one parameter delimited by a column,
+      similar to scp (e.g. foohost:/path)
     * Allow to provide an absolute path to the file you'd like to copy.
 
 0.2 (2012-03-08)

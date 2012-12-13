@@ -89,17 +89,11 @@ def sync():
         epilog=("Use at your own risk and not in production"
                 " environments!!!!".upper()))
     parser.add_argument(
-        "host",
-        help=("A hostname/ssh alias"),
-        type=str)
-    parser.add_argument(
-        "match",
-        help=("A match string the search is matching every file- and"
-              " directory name with. Each directory on the remote server"
-              " is split into segments. Each segment is matched against"
-              " the given `match` argument."
-              " Provide an absolute path and the remote server is not"
-              " searched, but it the path is used literally as a source."
+        "source",
+        help=("A sourcehost:path string. The source host has to be a valid"
+              " host or ssh alias for a host. The path either an absolute path"
+              " or regular expression for a path segment. Zyklop"
+              " connects to the server and finds an absolute path for you."
               ),
         type=str)
     parser.add_argument(
@@ -123,7 +117,7 @@ def sync():
 
     arguments = parser.parse_args()
 
-    alias = arguments.host
+    alias, match = arguments.source.split(':', 1)
 
     sshconfigfile = os.path.expanduser('~/.ssh/config')
     if not os.path.exists(sshconfigfile):
@@ -149,11 +143,12 @@ def sync():
         logger.setLevel(logging.DEBUG)
 
     results = search_for_remote_path(
-        sshconfighost, arguments.match, arguments.usesudo)
+        sshconfighost, match, arguments.usesudo)
     if not results:
-        logger.info("Can't find {arguments.match} under "
+        logger.info("Can't find {match} under "
                     "{hostname}:{port}{hostpath}.".format(
                         arguments=arguments,
+                        match=match,
                         hostpath='/',
                         hostname=hostname,
                         port=port))
