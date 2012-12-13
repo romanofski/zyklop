@@ -174,6 +174,8 @@ class Search(object):
         while 1:
             result = self.find(children=children,
                                visited=visited)
+            if result is None:
+                break
             children = result.children
             visited = result.visited
             yield result

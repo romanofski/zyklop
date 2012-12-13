@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library.  If not, see
 # <http://www.gnu.org/licenses/>.
+import mock
 import os
 import os.path
 import re
@@ -146,6 +147,13 @@ class TestSearch(unittest.TestCase):
         search.regexp = re.compile('^.*bin$')
         found = search.find()
         self.assertTrue(found.path.endswith('folder1/bin'))
+
+    @mock.patch.object(zyklop.search.Search, 'find')
+    def test_findall(self, fake_find):
+        fake_find.return_value = None
+
+        search = zyklop.search.Search('/', 'dummy', object)
+        self.assertListEqual([], list(search.findall()))
 
     def test_noresult(self):
         search = zyklop.search.Search('/', 'foobarnotexist',
