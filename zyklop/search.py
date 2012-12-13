@@ -167,6 +167,17 @@ class Search(object):
         level += 1
         return self.find(children, visited, level=level)
 
+    def findall(self):
+        """ Generator to yield all absolute paths."""
+        children = None
+        visited = None
+        while 1:
+            result = self.find(children=children,
+                               visited=visited)
+            children = result.children
+            visited = result.visited
+            yield result
+
 
 class DirectoryChildNodeProvider(object):
 

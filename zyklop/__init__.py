@@ -51,6 +51,34 @@ def get_command(sudo=False, **kw):
     return cmd
 
 
+def search_for_remote_path(sshconfighost, match, usesudo):
+    """ Depending on the given match, it performs a search on the remote
+        server for a match and returns all absolute paths which match.
+
+    ..  note:: Currently only path segments match :(
+    ..  note:: If the match is an absolute path, the result will be one
+               item which is the given match.
+
+    :param sshconfighost: str - host to connect to
+    :param match: str (can be regular expression)
+    :param usesudo: boolean. If sudo should be used to find a remote
+                    path.
+    :rtype: iterable
+    """
+    if match.startswith('/'):
+        result = [zyklop.search.SearchResult(match, 0)]
+    else:
+        sftpclient = zyklop.ssh.create_fake_sftpclient(
+            sshconfighost,
+            match,
+            use_sudo=usesudo)
+        search = zyklop.search.Search(
+            '/', match,
+            zyklop.search.ParamikoChildNodeProvider(sftpclient))
+        result = search.findall()
+    return result
+
+
 def sync():
     """ Entry point which parses given arguments, searches for a
         file/directory to sync on the remote server and passes it on to
@@ -70,6 +98,8 @@ def sync():
               " directory name with. Each directory on the remote server"
               " is split into segments. Each segment is matched against"
               " the given `match` argument."
+              " Provide an absolute path and the remote server is not"
+              " searched, but it the path is used literally as a source."
               ),
         type=str)
     parser.add_argument(
@@ -118,14 +148,9 @@ def sync():
     if arguments.verbose:
         logger.setLevel(logging.DEBUG)
 
-    sftpclient = zyklop.ssh.create_fake_sftpclient(sshconfighost,
-                                                   arguments.match,
-                                                   use_sudo=arguments.usesudo)
-    search = zyklop.search.Search(
-        '/', arguments.match,
-        zyklop.search.ParamikoChildNodeProvider(sftpclient))
-    result = search.find()
-    if not result:
+    results = search_for_remote_path(
+        sshconfighost, arguments.match, arguments.usesudo)
+    if not results:
         logger.info("Can't find {arguments.match} under "
                     "{hostname}:{port}{hostpath}.".format(
                         arguments=arguments,
@@ -134,25 +159,20 @@ def sync():
                         port=port))
         sys.exit(1)
 
-    while result:
+    for result in results:
         s = raw_input("Use {0}? (Y)es/(N)o/(A)bort ".format(result.path))
         if s.lower() == 'y':
+            localdir = arguments.destination
+            cmd = get_command(arguments.usesudo, **dict(
+                hostname=hostname,
+                remotepath=result.path,
+                localdir=localdir,
+                user=user,
+                port=port)
+                )
+            logger.info(' '.join(cmd))
+            subprocess.call(cmd)
             break
-        elif s.lower() == 'a':
+        elif s.lower() in ['a', 'q']:
             sys.exit(0)
-        else:
-            search.top = result.path
-            result = search.find(children=result.children,
-                                 visited=result.visited)
 
-    if result:
-        localdir = arguments.destination
-        cmd = get_command(arguments.usesudo, **dict(
-            hostname=hostname,
-            remotepath=result.path,
-            localdir=localdir,
-            user=user,
-            port=port)
-            )
-        logger.info(' '.join(cmd))
-        subprocess.call(cmd)

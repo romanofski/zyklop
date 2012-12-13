@@ -58,6 +58,12 @@ like blobstorage.old from a remote server::
     Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
     rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
+Use an **absolute path** if you know exactly where to copy from::
+
+    $ zyklop spameggs /tmp/Data.fs .
+    Use /tmp/blobstorage? Y(es)/N(o)/A(bort) y
+    rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/tmp/Data.fs /home/roman/projects/plone4/var/
+
 Syncing a directory which needs higher privileges. We use the ``-s``
 argument::
 
