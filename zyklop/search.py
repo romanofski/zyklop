@@ -137,14 +137,13 @@ class Search(object):
         """ Performs a BFS and matches every child with the provided
             regular expression to find the goal node.
         """
-        if level == self.maxdepth:
-            return
-        if visited is None:
-            visited = []
-
         if not children:
             children = collections.deque(
                 self.childnodeprovider.get_children(self.top))
+        if level == self.maxdepth or not children:
+            return
+        if visited is None:
+            visited = []
 
         while children:
             child = children.pop()
@@ -156,13 +155,9 @@ class Search(object):
                 return SearchResult(child, level, children, visited)
             visited.append(child)
 
-        self.logger.debug("Extending search space.")
         for c in visited:
             children.extendleft(
                 self.childnodeprovider.get_children(c))
-            self.logger.debug(
-                "By {0} nodes".format(
-                    len(children)))
 
         level += 1
         return self.find(children, visited, level=level)
