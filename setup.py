@@ -1,12 +1,12 @@
 # coding: utf-8
 from setuptools import setup, find_packages
 
-version = '0.2'
+version = '0.3'
 
 setup(
     name='zyklop',
     version=version,
-    description="Find to sync large files",
+    description="Rsync wrapper making syncing easy",
     long_description=(
         open("README.rst").read() + '\n\n' +
         open("docs/CHANGES.txt").read()

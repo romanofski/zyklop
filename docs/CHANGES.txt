@@ -1,7 +1,7 @@
 CHANGES
 =======
 
-0.3 (unreleased)
+0.3 (2013-01-14)
 ----------------
 
     * Changed host, match parameters: Now you can specify the source
