@@ -3,3 +3,7 @@ install:
     - python bootstrap.py
     - ./bin/buildout
 script: ./bin/test
+notifications:
+    email:
+        on_success: never
+        on_failure: change
