@@ -71,6 +71,23 @@ argument::
     Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
     rsync -av -e ssh -l roman -p 522 --rsync-path=sudo rsync --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
+Known Problems
+--------------
+
+I've started zyklop and the command just hangs and seems to be doing
+nothing.
+    This can be caused by paramiko and a not sufficient SSH setup. Make
+    sure you can login without problems by simply issuing a::
+
+        ssh myhost
+
+    If that does not solve your problem, try to provide an absolute path
+    from the source. Sometimes users don't have many privileges on the
+    remote server and the paramiko just waits for the output of a remote
+    command::
+
+        zyklop myhost:/path/to/file .
+
 Motivation
 ==========
 
