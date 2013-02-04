@@ -15,61 +15,73 @@ Requirements
     * rsync installed
     * locate installed with up-to-date database on the remote system
 
-SSH Configuration
------------------
 
-Make sure you have an SSH configuration file in your ``$HOME``
-directory. This tends to be very useful, as it keeps all necessary
-logins and ssh server access configurations, e.g.::
+First Steps
+===========
 
-    Host spameggs
-    Hostname  12.112.11.122
-    Compression yes
-    CompressionLevel 9
-    User guido
+If you are new to ssh, setup an ssh configuration first. If you are
+dealing with a lot of servers, giving them an alias makes them easier to
+remember and you don't have to type as much.
 
-    Host example2
-    HostName example2.examples.com
-    User johndoe
-    Port 22
+    #. Create an ssh configuration in your SSH home, e.g.::
+
+        vim ~/.ssh/config
+
+       You can use the following example as a starter::
+
+        Host spameggs
+        Hostname  12.112.11.122
+        Compression yes
+        CompressionLevel 9
+        User guido
+
+       but be sure to check the `documentation
+       <https://duckduckgo.com/?q=ssh+config+documentation&t=canonical>`_
+       or the man page (5) for `ssh_config`
+
+    #. Make the config only readable for the owner::
+
+        chmod 600 ~/.ssh/config
+
+    #. Test if you can login to your configured host using only your
+       alias::
+
+        ssh spameggs
 
 Examples
 ========
 
-..  note::
-    Reusing server definitions from SSH Configuration.
+    #. Syncing ZODB from remote server configured in ``~/.ssh/config``
+       as spameggs. We choose not the first database, but the second::
 
-Syncing ZODB from remote server configured in ``~/.ssh/config`` as
-spameggs. We choose not the first database, but the second::
+        $ pwd
+        /home/roman/projects/plone4/var/filestorage
+        $ zyklop spameggs:Data.fs .
+        Use /opt/otherbuildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) n
+        Use /opt/buildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) y
+        rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/filestorage/Data.fs /home/roman/projects/plone4/var/filestorage
 
-    $ pwd
-    /home/roman/projects/plone4/var/filestorage
-    $ zyklop spameggs:Data.fs .
-    Use /opt/otherbuildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) n
-    Use /opt/buildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) y
-    rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/filestorage/Data.fs /home/roman/projects/plone4/var/filestorage
+    #. Syncing a directory which ends with blobstorage, and not
+       directories like blobstorage.old from a remote server::
 
-Syncing a directory which ends with blobstorage, and not directories
-like blobstorage.old from a remote server::
+        $ pwd
+        /home/roman/projects/plone4/var/blobstorage
+        $ zyklop spameggs:blobstorage$ .
+        Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
+        rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
-    $ pwd
-    /home/roman/projects/plone4/var/blobstorage
-    $ zyklop spameggs:blobstorage$ .
-    Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
-    rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
+    #. Use an **absolute path** if you know exactly where to copy from::
 
-Use an **absolute path** if you know exactly where to copy from::
+        $ zyklop spameggs:/tmp/Data.fs .
+        Use /tmp/blobstorage? Y(es)/N(o)/A(bort) y
+        rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/tmp/Data.fs /home/roman/projects/plone4/var/
 
-    $ zyklop spameggs:/tmp/Data.fs .
-    Use /tmp/blobstorage? Y(es)/N(o)/A(bort) y
-    rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/tmp/Data.fs /home/roman/projects/plone4/var/
+    #. Syncing a directory which needs higher privileges. We use the
+       ``-s`` argument::
 
-Syncing a directory which needs higher privileges. We use the ``-s``
-argument::
-
-    $ zyklop -s spameggs:blobstorage$ .
-    Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
-    rsync -av -e ssh -l roman -p 522 --rsync-path=sudo rsync --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
+        $ zyklop -s spameggs:blobstorage$ .
+        Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
+        rsync -av -e ssh -l roman -p 522 --rsync-path=sudo rsync --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
 Known Problems
 --------------
