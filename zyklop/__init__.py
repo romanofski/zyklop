@@ -109,6 +109,14 @@ def sync():
         help=("Increase logging verbosity to DEBUG"),
         action="store_true")
     parser.add_argument(
+        "-d",
+        "--dry-run",
+        dest='dryrun',
+        help=("Selects a dry run, which prints only the found source "
+              "path(s). If multiple paths are found, the paths are "
+              "newline separated"),
+        action="store_true")
+    parser.add_argument(
         "-s",
         "--use-sudo",
         dest='usesudo',
@@ -155,6 +163,13 @@ def sync():
         sys.exit(1)
 
     for result in results:
+        # in a dry run mode, we only print all result paths
+        if arguments.dryrun:
+            logger.info(result.path)
+            continue
+
+        # otherwise, keep on looping and ask the user if we should pass
+        # the selected path to rsync
         s = raw_input("Use {0}? (Y)es/(N)o/(A)bort ".format(result.path))
         if s.lower() == 'y':
             localdir = arguments.destination
@@ -170,4 +185,4 @@ def sync():
             break
         elif s.lower() in ['a', 'q']:
             sys.exit(0)
-
+    sys.exit(0)

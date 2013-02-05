@@ -77,6 +77,13 @@ Examples
 
         $ zyklop -s spameggs:blobstorage$ .
 
+    #. **Dry run** prints out all found remote paths and just exits::
+
+        $ zyklop -d spameggs:blobstorage$ .
+        /opt/otherbuildout/var/blobstorage
+        /opt/otherbuildout/var/blobstorage.old
+        /opt/buildout/var/blobstorag
+
 Known Problems
 --------------
 

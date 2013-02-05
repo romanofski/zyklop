@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+0.5 (unreleased)
+----------------
+
+    * Added -d or --dry-run option to only print out found
+      remote paths by zyklop
+
 0.4 (2013-02-05)
 ----------------
 
