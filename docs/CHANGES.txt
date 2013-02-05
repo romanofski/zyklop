@@ -5,6 +5,8 @@ CHANGES
 ----------------
 
     * Improved documentation
+    * Fixed bug, which lead to a hanging command when issuing a remote
+      command in order to find the target path
 
 0.3 (2013-01-14)
 ----------------

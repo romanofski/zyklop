@@ -54,34 +54,28 @@ Examples
     #. Syncing ZODB from remote server configured in ``~/.ssh/config``
        as spameggs. We choose not the first database, but the second::
 
-        $ pwd
-        /home/roman/projects/plone4/var/filestorage
         $ zyklop spameggs:Data.fs .
         Use /opt/otherbuildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) n
         Use /opt/buildout/var/filestorage/Data.fs? Y(es)/N(o)/A(bort) y
-        rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/filestorage/Data.fs /home/roman/projects/plone4/var/filestorage
 
-    #. Syncing a directory which ends with blobstorage, and not
-       directories like blobstorage.old from a remote server::
+    #. Syncing a directory providing a path segment::
 
-        $ pwd
-        /home/roman/projects/plone4/var/blobstorage
+        $ zyklop spameggs:buildout/var/filestorage$ .
+
+    #. Syncing a directory which ends with `blobstorage``, excluding any
+       other `blobstorage` directories with postfixes in the name (e.g.
+       `blobstorage.old`)::
+
         $ zyklop spameggs:blobstorage$ .
-        Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
-        rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
     #. Use an **absolute path** if you know exactly where to copy from::
 
         $ zyklop spameggs:/tmp/Data.fs .
-        Use /tmp/blobstorage? Y(es)/N(o)/A(bort) y
-        rsync -av -e ssh -l roman -p 522 --partial --progress --compress-level=9 12.112.11.122:/tmp/Data.fs /home/roman/projects/plone4/var/
 
     #. Syncing a directory which needs higher privileges. We use the
        ``-s`` argument::
 
         $ zyklop -s spameggs:blobstorage$ .
-        Use /opt/buildout/var/blobstorage? Y(es)/N(o)/A(bort) y
-        rsync -av -e ssh -l roman -p 522 --rsync-path=sudo rsync --partial --progress --compress-level=9 12.112.11.122:/opt/buildout/var/blobstorage /home/roman/projects/plone4/var/
 
 Known Problems
 --------------
