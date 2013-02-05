@@ -82,8 +82,6 @@ class FakeSFTPClient(object):
         sudo = use_sudo and 'sudo' or ''
         locatecmd = self.locate_templ.format(sudo=sudo, pattern=pattern)
         locatecmd = locatecmd.strip()
-        channel = self.sshclient.invoke_shell()
-        channel.send(locatecmd)
         stdin, stdout, stderr = self.sshclient.exec_command(locatecmd)
         error = stderr.read()
         if error:
