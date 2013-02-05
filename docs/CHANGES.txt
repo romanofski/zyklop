@@ -4,8 +4,9 @@ CHANGES
 0.5 (unreleased)
 ----------------
 
-    * Added -d or --dry-run option to only print out found
+    * Added -d or --dry-run switch to only print out found
       remote paths by zyklop
+    * Added -y or --assume-yes switch to sync the first result found.
 
 0.4 (2013-02-05)
 ----------------

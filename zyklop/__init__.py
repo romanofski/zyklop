@@ -122,6 +122,13 @@ def sync():
         dest='usesudo',
         help=("Use sudo rights to copy/search on the remote server."),
         action="store_true")
+    parser.add_argument(
+        "-y",
+        "--assume-yes",
+        dest='assumeyes',
+        help=("Pick the first found destination path for syncing and "
+              "don't prompt the user."),
+        action="store_true")
 
     arguments = parser.parse_args()
 
@@ -170,7 +177,11 @@ def sync():
 
         # otherwise, keep on looping and ask the user if we should pass
         # the selected path to rsync
-        s = raw_input("Use {0}? (Y)es/(N)o/(A)bort ".format(result.path))
+        if not arguments.assumeyes:
+            s = raw_input("Use {0}? (Y)es/(N)o/(A)bort ".format(result.path))
+        else:
+            s = 'y'
+
         if s.lower() == 'y':
             localdir = arguments.destination
             cmd = get_command(arguments.usesudo, **dict(

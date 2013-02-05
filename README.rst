@@ -84,6 +84,12 @@ Examples
         /opt/otherbuildout/var/blobstorage.old
         /opt/buildout/var/blobstorag
 
+    #. Sync the first result zyklop finds automatically **without
+       prompting**::
+
+        $ zyklop -y spameggs:blobstorage$ .
+
+
 Known Problems
 --------------
 
