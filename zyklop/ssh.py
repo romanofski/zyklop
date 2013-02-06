@@ -17,6 +17,7 @@ from __future__ import print_function
 import getpass
 import os
 import paramiko
+import zyklop.command
 import zyklop.search
 
 
@@ -64,6 +65,7 @@ def create_fake_sftpclient(sshconfig, pattern, **kw):
                 break
         except paramiko.SSHException:
             continue
+    client.set_log_channel(zyklop.command.logger.name)
     return FakeSFTPClient(client, pattern, **kw)
 
 
@@ -79,9 +81,18 @@ class FakeSFTPClient(object):
         self.tree = self._create_tree(pattern, use_sudo)
 
     def _create_tree(self, pattern, use_sudo):
+        """
+        Issues the remote locate command and traverses the returned
+        paths into a tree structure.
+
+        TODO: Note to self: I'm not sure if the tree provides any
+        benefit here really.
+        """
         sudo = use_sudo and 'sudo' or ''
         locatecmd = self.locate_templ.format(sudo=sudo, pattern=pattern)
         locatecmd = locatecmd.strip()
+        zyklop.command.logger.debug('Remote: {0}'.format(locatecmd))
+
         stdin, stdout, stderr = self.sshclient.exec_command(locatecmd)
         error = stderr.read()
         if error:
@@ -90,6 +101,8 @@ class FakeSFTPClient(object):
                     error=error))
 
         paths = stdout.readlines()
+        zyklop.command.logger.debug('Found: {0}'.format(paths))
+
         tree = zyklop.search.TreeNode()
         for path in paths:
             path = path.strip()
