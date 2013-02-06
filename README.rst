@@ -93,8 +93,7 @@ Examples
 Known Problems
 --------------
 
-I've started zyklop and the command just hangs and seems to be doing
-nothing.
+Zyklop just hangs
     This can be caused by paramiko and a not sufficient SSH setup. Make
     sure you can login without problems by simply issuing a::
 

@@ -1,12 +1,13 @@
 CHANGES
 =======
 
-0.5 (unreleased)
+0.5 (2013-02-06)
 ----------------
 
     * Added -d or --dry-run switch to only print out found
       remote paths by zyklop
     * Added -y or --assume-yes switch to sync the first result found.
+    * Fixed b0rked README.rst
 
 0.4 (2013-02-05)
 ----------------
