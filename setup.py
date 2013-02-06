@@ -1,12 +1,16 @@
 # coding: utf-8
 from setuptools import setup, find_packages
+from zyklop import __author__
+from zyklop import __author_email__
+from zyklop import __description__
+from zyklop import __name__
+from zyklop import __version__
 
-version = '0.5'
 
 setup(
-    name='zyklop',
-    version=version,
-    description="Rsync wrapper making syncing easy",
+    name=__name__,
+    version=__version__,
+    description=__description__,
     long_description=(
         open("README.rst").read() + '\n\n' +
         open("docs/CHANGES.txt").read()
@@ -23,8 +27,8 @@ setup(
         "Topic :: System :: Systems Administration",
     ],
     keywords='server',
-    author='Róman Joost',
-    author_email='roman@bromeco.de',
+    author=__author__,
+    author_email=__author_email__,
     url='http://zyklop.rtfd.org',
     license='GPL',
     packages=find_packages(exclude=['ez_setup']),
@@ -40,7 +44,7 @@ setup(
     ),
     entry_points={
         'console_scripts': [
-            'zyklop = zyklop:sync',
+            'zyklop = zyklop.command:sync',
         ]
     }
 )

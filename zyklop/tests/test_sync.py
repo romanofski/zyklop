@@ -1,6 +1,6 @@
+from zyklop.command import get_command
+from zyklop.command import search_for_remote_path
 import unittest
-from zyklop import get_command
-from zyklop import search_for_remote_path
 import zyklop.search
 
 
