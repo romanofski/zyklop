@@ -51,15 +51,15 @@ def create_fake_sftpclient(sshconfig, pattern, **kw):
     hostname = sshconfig.get('hostname')
     port = int(sshconfig.get('port', 22))
     mykeys = get_user_pkey(sshconfig)
-    user = os.environ['LOGNAME']
+    user = sshconfig.get('user', os.environ['LOGNAME'])
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     for key in mykeys:
         try:
             client.connect(hostname=hostname,
-                          port=port,
-                          username=user,
-                          pkey=key)
+                           port=port,
+                           username=user,
+                           pkey=key)
             transport = client.get_transport()
             if transport.is_authenticated:
                 break

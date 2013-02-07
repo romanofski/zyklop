@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library.  If not, see
 # <http://www.gnu.org/licenses/>.
-import unittest
 import StringIO
+import mock
+import paramiko
+import unittest
 import zyklop.ssh
 
 
@@ -77,3 +79,27 @@ class TestFakeSFTPClient(unittest.TestCase):
              StringIO.StringIO("Something shitty happened")
             )
         )
+
+    @mock.patch.dict('os.environ', dict(LOGNAME='testuser'))
+    @mock.patch.object(zyklop.ssh, 'FakeSFTPClient')
+    @mock.patch.object(paramiko, 'SSHClient')
+    def test_create_fake_sftpclient_called_with_ssh_config_user(
+            self, sshclient, sftpclient):
+        config = dict(hostname='foo')
+        client = sshclient()
+
+        zyklop.ssh.create_fake_sftpclient(config, 'ignored')
+        client.connect.assert_called_once_with(
+            username='testuser', pkey=mock.ANY,
+            hostname=config['hostname'], port=22)
+
+        # the code should prefer the user from the ssh config
+        client.reset_mock()
+        config['user'] = 'newuser'
+        zyklop.ssh.create_fake_sftpclient(config, 'ignored')
+
+        client.connect.assert_called_once_with(
+            username=config['user'], pkey=mock.ANY,
+            hostname=config['hostname'], port=22)
+
+

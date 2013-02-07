@@ -5,6 +5,8 @@ CHANGES
 ----------------
 
     * Command line utility now shows version information.
+    * Bugfix: now uses the 'user' configured in the ssh config and falls
+      back to the environment user
 
 0.5 (2013-02-06)
 ----------------
