@@ -81,17 +81,21 @@ class TestFakeSFTPClient(unittest.TestCase):
         )
 
     @mock.patch.dict('os.environ', dict(LOGNAME='testuser'))
+    @mock.patch.object(zyklop.ssh, 'get_user_pkey')
     @mock.patch.object(zyklop.ssh, 'FakeSFTPClient')
     @mock.patch.object(paramiko, 'SSHClient')
     def test_create_fake_sftpclient_called_with_ssh_config_user(
-            self, sshclient, sftpclient):
+            self, sshclient, sftpclient, get_user_pkey):
         config = dict(hostname='foo')
         client = sshclient()
+        get_user_pkey.return_value = ['key']
 
         zyklop.ssh.create_fake_sftpclient(config, 'ignored')
         client.connect.assert_called_once_with(
             username='testuser', pkey=mock.ANY,
             hostname=config['hostname'], port=22)
+        get_user_pkey.assert_called_once_with(
+            config)
 
         # the code should prefer the user from the ssh config
         client.reset_mock()
@@ -101,5 +105,3 @@ class TestFakeSFTPClient(unittest.TestCase):
         client.connect.assert_called_once_with(
             username=config['user'], pkey=mock.ANY,
             hostname=config['hostname'], port=22)
-
-
