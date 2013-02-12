@@ -38,6 +38,13 @@ logger.addHandler(stdout)
 logger.setLevel(logging.INFO)
 
 
+def get_username(sshconfig={}):
+    """ Returns a string of the username retrieved from the sshconfig.
+        Falls back to the `user` of the environment.
+    """
+    return sshconfig.get('user', os.environ['LOGNAME'])
+
+
 def get_command(sudo=False, **kw):
     """ Formats the template string and returns subprocess compatible
         command.
@@ -153,7 +160,7 @@ def sync():
     sshconfighost = sshconfig.lookup(alias)
     hostname = sshconfighost.get('hostname')
     port = int(sshconfighost.get('port', 22))
-    user = os.environ['LOGNAME']
+    user = get_username(sshconfighost)
 
     if not hostname:
         logger.warn("Can't find configuration"

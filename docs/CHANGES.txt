@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+0.5.2 (2013-02-12)
+------------------
+
+    * Bugfix: use one function to retrieve the username.
+
 0.5.1 (2013-02-12)
 ------------------
 
