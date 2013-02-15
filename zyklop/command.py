@@ -151,8 +151,9 @@ def sync():
 
     sshconfigfile = os.path.expanduser('~/.ssh/config')
     if not os.path.exists(sshconfigfile):
-        logger.error("Can't find your ssh configuration under "
-                     " ~/.ssh/config.")
+        logger.error("Can't find your ssh configuration under"
+                     " ~/.ssh/config. Please create one and consult"
+                     " the man page ssh_config (5)")
         sys.exit(1)
 
     sshconfig = paramiko.SSHConfig()
