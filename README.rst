@@ -13,15 +13,15 @@ Requirements
 
     * Python >= 2.6 (Python >= 2.7 for tests)
     * rsync installed
-    * locate installed with up-to-date database on the remote system
+    * **locate** installed with up-to-date database on the remote system
 
 
 First Steps
 ===========
 
 If you are new to ssh, setup an ssh configuration first. If you are
-dealing with a lot of servers, giving them an alias makes them easier to
-remember and you don't have to type as much.
+dealing with a lot of servers, giving them an alias makes it easier to
+remember.
 
     #. Create an ssh configuration in your SSH home, e.g.::
 
@@ -48,10 +48,19 @@ remember and you don't have to type as much.
 
         ssh spameggs
 
+    #. Test if locate works on the remote server by searching for a test
+       directory (here called `findmesomething`)::
+
+        locate findmesomething
+
+    #. Now you can copy/sync `findmesomething` with zyklop::
+
+        zyklop spameggs:findmesomething .
+
 Examples
 ========
 
-    #. Syncing ZODB from remote server configured in ``~/.ssh/config``
+    #. Syncing a ZODB from remote server configured in ``~/.ssh/config``
        as spameggs. We choose not the first database, but the second::
 
         $ zyklop spameggs:Data.fs .

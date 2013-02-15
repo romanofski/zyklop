@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+0.6 (unreleased)
+----------------
+
+    * Documentation improvements.
+
 0.5.2 (2013-02-12)
 ------------------
 
