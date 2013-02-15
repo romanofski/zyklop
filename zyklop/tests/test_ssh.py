@@ -57,6 +57,15 @@ class TestFakeSFTPClient(unittest.TestCase):
         )
         self.assertEquals(2, len(client.tree['spam'].children))
 
+    def test__create_tree_error(self):
+        client = (StringIO.StringIO(),
+                  StringIO.StringIO(),
+                  StringIO.StringIO("bash: locate: command not found\n")
+                 )
+        self.assertRaises(OSError,
+                          self.create_FakeSSHClient,
+                          client)
+
     def test_listdir(self):
         client = self.create_FakeSSHClient(
             (StringIO.StringIO(),

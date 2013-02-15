@@ -97,7 +97,9 @@ class FakeSFTPClient(object):
         error = stderr.read()
         if error:
             raise OSError(
-                "An error occured during initialisation: {error}".format(
+                "An error on the remote server:\n\n\t{error}\nThis could be"
+                " caused due to a missing locate command. Make"
+                " sure that 'locate' is installed on the remote server.".format(
                     error=error))
 
         paths = stdout.readlines()
