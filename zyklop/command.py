@@ -29,6 +29,9 @@ SSH_CMD = 'ssh -l {user} -p {port}'
 RSYNC_TEMPL = ('rsync -av -e '
                '-P --compress-level=9 '
                '{hostname}:"{remotepath}" {localdir}')
+ERROR_NO_SSH_CONFIGFILE = ("Can't find your ssh configuration under"
+                           " ~/.ssh/config. Please create one and consult"
+                           " the man page ssh_config (5)")
 
 
 logger = logging.getLogger('zyklop')
@@ -87,11 +90,8 @@ def search_for_remote_path(sshconfighost, match, usesudo):
     return result
 
 
-def sync():
-    """ Entry point which parses given arguments, searches for a
-        file/directory to sync on the remote server and passes it on to
-        rsync.
-    """
+def _setup_commandline_arguments():
+    """ Helper method to setup arguments and argument parser. """
     parser = argparse.ArgumentParser(
         description='{name} {version} -- {description}'.format(
             name=zyklop.__name__, version=zyklop.__version__,
@@ -144,18 +144,22 @@ def sync():
         help=("Pick the first found destination path for syncing and "
               "don't prompt the user."),
         action="store_true")
+    return parser
 
-    arguments = parser.parse_args()
 
-    alias, match = arguments.source.split(':', 1)
-
+def sync():
+    """ Entry point which parses given arguments, searches for a
+        file/directory to sync on the remote server and passes it on to
+        rsync.
+    """
     sshconfigfile = os.path.expanduser('~/.ssh/config')
     if not os.path.exists(sshconfigfile):
-        logger.error("Can't find your ssh configuration under"
-                     " ~/.ssh/config. Please create one and consult"
-                     " the man page ssh_config (5)")
+        logger.error(ERROR_NO_SSH_CONFIGFILE)
         sys.exit(1)
 
+    parser = _setup_commandline_arguments()
+    arguments = parser.parse_args()
+    alias, match = arguments.source.split(':', 1)
     sshconfig = paramiko.SSHConfig()
     sshconfig.parse(open(sshconfigfile, 'r'))
     sshconfighost = sshconfig.lookup(alias)

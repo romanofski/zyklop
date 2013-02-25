@@ -40,7 +40,9 @@ setup(
         'argparse',
     ],
     extras_require=dict(
-        test=['mock', ]
+        test=['mock',
+              'testfixtures',
+              ]
     ),
     entry_points={
         'console_scripts': [
